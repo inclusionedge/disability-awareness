@@ -9,6 +9,7 @@
 <style>
 :root{
   --ink:#1E2A3C;
+  --amber-text:#7E5410;
   --ink-soft:#4A5A70;
   --teal:#1A4F9C;
   --deep:#0F3568;
@@ -43,6 +44,8 @@ h1,h2,h3,h4,.display{font-family:"Bricolage Grotesque","Atkinson Hyperlegible",s
 button{font-family:inherit;font-size:inherit;cursor:pointer}
 a{color:var(--teal)}
 :focus-visible{outline:3px solid var(--mango);outline-offset:2px;border-radius:4px}
+.skiplink{position:absolute;left:-999px;top:0;z-index:100;background:var(--deep);color:#fff;padding:10px 18px;border-radius:0 0 10px 0;font-weight:700}
+.skiplink:focus{left:0}
 .sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
 
 /* ---------- app chrome ---------- */
@@ -114,7 +117,7 @@ main{max-width:var(--maxw);margin:0 auto;padding:34px 20px 90px}
 .callout{border-radius:var(--radius);padding:18px 20px;margin:20px 0;border:1px solid;font-size:.98rem}
 .callout .co-label{font-weight:800;font-size:.78rem;letter-spacing:.1em;text-transform:uppercase;display:block;margin-bottom:6px}
 .callout.key{background:#E8EFF9;border-color:#C3D4EE}.callout.key .co-label{color:var(--teal)}
-.callout.warm{background:var(--mango-soft);border-color:#EFD9AE}.callout.warm .co-label{color:#A66B12}
+.callout.warm{background:var(--mango-soft);border-color:#EFD9AE}.callout.warm .co-label{color:var(--amber-text)}
 .callout.note{background:var(--card);border-color:var(--line)}.callout.note .co-label{color:var(--ink-soft)}
 
 .quote{border-left:5px solid;border-image:var(--spectrum) 1;padding:6px 0 6px 20px;margin:24px 0;font-size:1.15rem;font-family:"Bricolage Grotesque";font-weight:600;color:var(--deep)}
@@ -162,7 +165,7 @@ main{max-width:var(--maxw);margin:0 auto;padding:34px 20px 90px}
 
 /* MCQ */
 .mcq{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);padding:20px;margin:22px 0;box-shadow:var(--shadow)}
-.mcq .q-label{font-size:.75rem;font-weight:800;letter-spacing:.12em;text-transform:uppercase;color:var(--mango);margin-bottom:8px;display:flex;align-items:center;gap:7px}
+.mcq .q-label{font-size:.75rem;font-weight:800;letter-spacing:.12em;text-transform:uppercase;color:var(--amber-text);margin-bottom:8px;display:flex;align-items:center;gap:7px}
 .mcq h4{font-size:1.05rem;margin-bottom:14px;color:var(--deep)}
 .mcq .opts{display:flex;flex-direction:column;gap:9px}
 .mcq .opt{border:1.5px solid var(--line);border-radius:11px;padding:12px 15px;background:var(--mist);text-align:left;font-size:.95rem;transition:border-color .12s}
@@ -190,7 +193,7 @@ main{max-width:var(--maxw);margin:0 auto;padding:34px 20px 90px}
 
 /* scenario */
 .scenario{background:var(--deep);border-radius:18px;padding:24px 22px;margin:26px 0;color:#E9EFF8;box-shadow:var(--shadow)}
-.scenario .sc-label{font-size:.74rem;font-weight:800;letter-spacing:.14em;text-transform:uppercase;color:var(--mango);margin-bottom:10px}
+.scenario .sc-label{font-size:.74rem;font-weight:800;letter-spacing:.14em;text-transform:uppercase;color:#F3C067;margin-bottom:10px}
 .scenario h3{color:#fff;font-size:1.3rem;margin-bottom:6px}
 .scenario .sc-setting{font-size:.9rem;color:#B9C8DE;margin-bottom:18px}
 .sc-node{background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.14);border-radius:14px;padding:18px;margin-top:14px}
@@ -211,11 +214,11 @@ main{max-width:var(--maxw);margin:0 auto;padding:34px 20px 90px}
 
 /* reflection */
 .reflect{background:var(--mango-soft);border:1px solid #EFD9AE;border-radius:var(--radius);padding:20px;margin:24px 0}
-.reflect .r-label{font-size:.75rem;font-weight:800;letter-spacing:.12em;text-transform:uppercase;color:#A66B12;margin-bottom:8px;display:flex;gap:7px;align-items:center}
+.reflect .r-label{font-size:.75rem;font-weight:800;letter-spacing:.12em;text-transform:uppercase;color:var(--amber-text);margin-bottom:8px;display:flex;gap:7px;align-items:center}
 .reflect h4{font-size:1.02rem;color:var(--deep);margin-bottom:10px}
 .reflect textarea{width:100%;min-height:96px;border:1.5px solid #E4CB97;border-radius:10px;padding:12px;font-family:inherit;font-size:.95rem;background:#fff;resize:vertical;color:var(--ink)}
 .reflect textarea:focus{outline:3px solid var(--mango);outline-offset:1px}
-.reflect .r-note{font-size:.78rem;color:#8A6420;margin-top:8px}
+.reflect .r-note{font-size:.78rem;color:var(--amber-text);margin-top:8px}
 
 /* confidence */
 .conf-row{display:flex;gap:8px;margin:14px 0;flex-wrap:wrap}
@@ -266,6 +269,19 @@ footer.site .band{height:6px;border-radius:99px;background:var(--spectrum);margi
   main{padding:0;max-width:none}
   .cert-sheet{border-width:4px;box-shadow:none;margin:0;page-break-inside:avoid}
 }
+/* ---------- access gate ---------- */
+.gatewrap{max-width:420px;margin:8vh auto 0;text-align:center}
+.gatewrap .lockicon{width:64px;height:64px;border-radius:18px;background:var(--card);border:1px solid var(--line);display:inline-flex;align-items:center;justify-content:center;color:var(--teal);box-shadow:var(--shadow);margin-bottom:18px}
+.gatewrap h1{font-size:1.6rem;color:var(--deep);margin-bottom:8px}
+.gatewrap .sub{color:var(--ink-soft);font-size:.95rem;margin-bottom:22px}
+.gatewrap input{width:100%;border:1.5px solid var(--line);border-radius:12px;padding:14px 16px;font-family:inherit;font-size:1.05rem;text-align:center;letter-spacing:.08em;margin-bottom:12px;background:var(--card)}
+.gatewrap input:focus{outline:3px solid var(--mango);outline-offset:1px}
+.gate-err{display:none;background:var(--coral-soft);color:#A13E28;border-radius:10px;padding:11px 14px;font-size:.88rem;font-weight:700;margin-bottom:12px}
+.gate-err.show{display:block}
+.gatewrap .gate-note{font-size:.78rem;color:var(--ink-soft);margin-top:18px}
+.codegen{max-width:560px;margin:0 auto}
+.codegen code{display:block;background:var(--card);border:1px solid var(--line);border-radius:10px;padding:12px;margin-top:10px;font-size:.85rem;word-break:break-all;text-align:left}
+
 /* ---------- video gate ---------- */
 .videogate{max-width:640px;margin:0 auto}
 .videogate h1{font-size:clamp(1.7rem,4.5vw,2.3rem);color:var(--deep);margin-bottom:8px}
@@ -314,6 +330,7 @@ footer.site .band{height:6px;border-radius:99px;background:var(--spectrum);margi
 </style>
 </head>
 <body>
+<a class="skiplink" href="#app">Skip to main content</a>
 <div id="ribbon" aria-hidden="true"><div class="fill" id="ribbonFill"></div></div>
 <header class="appbar">
   <div class="inner">
@@ -333,6 +350,7 @@ footer.site .band{height:6px;border-radius:99px;background:var(--spectrum);margi
 <main id="app" tabindex="-1"></main>
 <footer class="site">
   <div class="band"></div>
+  <p style="margin-bottom:10px"><button id="resetProgress" style="background:none;border:1px solid var(--line);border-radius:99px;padding:5px 14px;font-size:.78rem;color:var(--ink-soft);font-weight:700">Reset my progress</button></p>
   <p><strong>Pilot prototype.</strong> Content distilled from SG Enable's Disability Awareness Talk and related materials. All statistics and scheme details are to be verified with SG Enable before launch. This page is set in Atkinson Hyperlegible, a typeface designed for readers with low vision — a small example of designing for inclusion by default.</p>
 </footer>
 <script>
@@ -344,9 +362,42 @@ footer.site .band{height:6px;border-radius:99px;background:var(--spectrum);margi
    downloadable as evidence of completion.
 ========================================================= */
 
-/* ------- DEPLOYMENT CONFIG: edit these two lines only ------- */
+/* ------- DEPLOYMENT CONFIG ------- */
 const VIDEO_SRC   = 'intro.mp4';   // your MP4, placed in the same folder as this HTML file
 const VIDEO_TITLE = 'A message before you begin';
+const VIDEO_CAPTIONS = 'intro.vtt'; // optional WebVTT captions file beside the MP4; ignored if absent
+
+/* ACCESS CODES
+   One line per organisation. To ADD a code: open #/setcode in your browser,
+   type the new code, and paste the generated line below. To REMOVE an
+   organisation's access: delete its line. Devices re-verify against this
+   list, so removed codes lock out immediately; all codes expire from a
+   device after 30 days and must be re-entered.
+   The line below is a demo code: inclusion2026            */
+const ACCESS_CODES = [
+  '1c76617fe62e6f3e', // DEMO — replace before launch (code: inclusion2026)
+];
+const ACCESS_DAYS = 30;   // days before a device must re-enter the code
+
+/* small salted hash — deters casual reading of codes from source */
+function codeHash(str){
+  str = 'DAW::' + str.trim();
+  let h1=0xdeadbeef, h2=0x41c6ce57;
+  for(let i=0;i<str.length;i++){
+    const ch=str.charCodeAt(i);
+    h1=Math.imul(h1^ch,2654435761); h2=Math.imul(h2^ch,1597334677);
+  }
+  h1=Math.imul(h1^(h1>>>16),2246822507); h1^=Math.imul(h2^(h2>>>13),3266489909);
+  h2=Math.imul(h2^(h2>>>16),2246822507); h2^=Math.imul(h1^(h1>>>13),3266489909);
+  return (h2>>>0).toString(16).padStart(8,'0')+(h1>>>0).toString(16).padStart(8,'0');
+}
+function accessValid(){
+  const a = state.access;
+  if(!a || !a.codeHash || !a.grantedAt) return false;
+  if(!ACCESS_CODES.includes(a.codeHash)) return false;              // code was removed
+  if(Date.now() - a.grantedAt > ACCESS_DAYS*24*60*60*1000) return false; // expired
+  return true;
+}
 
 const state = {
   completed: {},        // moduleId -> true
@@ -356,13 +407,37 @@ const state = {
   quizScore: null,      // best score achieved
   videoDone: false,
   videoMax: 0,          // furthest point watched (seconds)
-  learnerName: ''
+  learnerName: '',
+  access: null          // {codeHash, grantedAt} — 30-day device unlock
 };
 
 /* ---------- persistence (safe: falls back to memory) ---------- */
 const store = (()=>{ try{ const t='__wa_probe'; localStorage.setItem(t,'1'); localStorage.removeItem(t); return localStorage; }catch(e){ return null; } })();
 function save(){ if(store){ try{ store.setItem('wa_state_v1', JSON.stringify(state)); }catch(e){} } }
-(function load(){ if(store){ try{ const s=store.getItem('wa_state_v1'); if(s) Object.assign(state, JSON.parse(s)); }catch(e){} } })();
+(function load(){
+  if(!store) return;
+  try{
+    const raw = store.getItem('wa_state_v1'); if(!raw) return;
+    const p = JSON.parse(raw);
+    /* validate shape; discard corrupt state rather than break */
+    if(typeof p!=='object' || p===null) throw 0;
+    if(p.completed && typeof p.completed==='object') state.completed = p.completed;
+    if(p.reflections && typeof p.reflections==='object') state.reflections = p.reflections;
+    if([1,2,3,4,5].includes(p.confidenceStart)) state.confidenceStart = p.confidenceStart;
+    if([1,2,3,4,5].includes(p.confidenceEnd)) state.confidenceEnd = p.confidenceEnd;
+    if(Number.isInteger(p.quizScore) && p.quizScore>=0) state.quizScore = p.quizScore;
+    if(p.videoDone===true) state.videoDone = true;
+    if(typeof p.videoMax==='number' && p.videoMax>=0) state.videoMax = p.videoMax;
+    if(typeof p.learnerName==='string') state.learnerName = p.learnerName;
+    if(p.access && typeof p.access.codeHash==='string' && typeof p.access.grantedAt==='number') state.access = p.access;
+  }catch(e){ try{ store.removeItem('wa_state_v1'); }catch(_){} }
+})();
+if(!store){
+  document.addEventListener('DOMContentLoaded',()=>{
+    const warn = el(`<div role="alert" style="max-width:var(--maxw);margin:10px auto 0;padding:10px 16px;background:var(--mango-soft);border:1px solid #EFD9AE;border-radius:10px;font-size:.85rem;color:var(--amber-text)"><strong>Heads up:</strong> this browser is blocking storage, so progress and reflections will not survive closing this tab. You can still complete the course in one sitting.</div>`);
+    document.querySelector('header.appbar').after(warn);
+  });
+}
 
 const TYPE_COLORS = { m0:'#6B5CA5', m1:'#3D5AA9', m2:'#1A4F9C', m3:'#1787A8', m4:'#4C9E5F', m5:'#6FA82F' };
 
@@ -434,7 +509,7 @@ const R = {
   },
 
   mcq: b => {
-    const box = el(`<div class="mcq"><div class="q-label">${ICONS.bulb} Quick check</div><h4>${b.q}</h4><div class="opts"></div><div class="fb"></div></div>`);
+    const box = el(`<div class="mcq"><div class="q-label">${ICONS.bulb} Quick check</div><h4>${b.q}</h4><div class="opts"></div><div class="fb" role="status" aria-live="polite" tabindex="-1"></div></div>`);
     const opts = box.querySelector('.opts'), fb = box.querySelector('.fb');
     b.options.forEach((o,i)=>{
       const btn = el(`<button class="opt">${o}</button>`);
@@ -442,6 +517,7 @@ const R = {
         [...opts.children].forEach(c=>c.disabled=true);
         if(i===b.answer){ btn.classList.add('correct'); fb.className='fb show good'; fb.innerHTML='<strong>Correct.</strong> '+b.why; }
         else { btn.classList.add('wrong'); opts.children[b.answer].classList.add('correct'); fb.className='fb show bad'; fb.innerHTML='<strong>Not quite.</strong> '+b.why; }
+        fb.focus({preventScroll:false});
         if(b.onAnswer) b.onAnswer(i===b.answer);
       });
       opts.appendChild(btn);
@@ -454,7 +530,7 @@ const R = {
     b.items.forEach(it=>{
       const card = el(`<div class="sort-item"><div class="stmt">&ldquo;${it.stmt}&rdquo;</div>
         <div class="choices"><button class="schoice" data-v="myth">Myth</button><button class="schoice" data-v="fact">Fact</button></div>
-        <div class="sfb"><span class="verdict"></span><div>${it.why}</div></div></div>`);
+        <div class="sfb" role="status" aria-live="polite"><span class="verdict"></span><div>${it.why}</div></div></div>`);
       card.querySelectorAll('.schoice').forEach(btn=>{
         btn.addEventListener('click',()=>{
           if(card.classList.contains('answered'))return;
@@ -502,7 +578,7 @@ const R = {
 
   scenario: b => {
     const box = el(`<div class="scenario"><div class="sc-label">Case scenario &middot; Singapore</div>
-      <h3>${b.title}</h3><div class="sc-setting">${b.setting}</div><div class="sc-stage"></div></div>`);
+      <h3>${b.title}</h3><div class="sc-setting">${b.setting}</div><div class="sc-stage" aria-live="polite"></div></div>`);
     const stage = box.querySelector('.sc-stage');
     let firstShow = true;
     function show(nodeId){
@@ -526,7 +602,11 @@ const R = {
       if(n.end){ const rb=el(`<button class="sc-btn">&#8634; Try a different path</button>`); rb.addEventListener('click',()=>show(b.start)); actions.appendChild(rb); }
       if(actions.children.length) node.appendChild(actions);
       stage.appendChild(node);
-      if(!firstShow && node.scrollIntoView) node.scrollIntoView({behavior:'smooth',block:'nearest'});
+      if(!firstShow){
+        if(node.scrollIntoView) node.scrollIntoView({behavior:'smooth',block:'nearest'});
+        const focusTarget = node.querySelector('.sc-choice, .sc-btn');
+        if(focusTarget) focusTarget.focus({preventScroll:true});
+      }
       firstShow = false;
     }
     show(b.start);
@@ -888,7 +968,7 @@ R.quiz = () => {
   function build(){
     wrap.innerHTML = '';
     let answered = 0, correct = 0;
-    const scoreCard = el('<div class="score-card" style="display:none"><div class="big"></div><p class="verdict-line" style="margin-top:6px"></p><div class="cert-actions" style="justify-content:center;margin-top:16px"></div></div>');
+    const scoreCard = el('<div class="score-card" role="status" aria-live="polite" tabindex="-1" style="display:none"><div class="big"></div><p class="verdict-line" style="margin-top:6px"></p><div class="cert-actions" style="justify-content:center;margin-top:16px"></div></div>');
     QUIZ.forEach((qz,idx)=>{
       /* shuffle option order on every (re)build */
       const order = qz.options.map((_,i)=>i).sort(()=>Math.random()-0.5);
@@ -919,6 +999,7 @@ R.quiz = () => {
             const gate = document.getElementById('m5gate'); if(gate) gate.replaceWith(m5GateNode());
             const act = document.getElementById('m6actions'); if(act) act.replaceWith(m6Actions());
             if(scoreCard.scrollIntoView) scoreCard.scrollIntoView({behavior:'smooth',block:'center'});
+            scoreCard.focus({preventScroll:true});
           }
         }}));
     });
@@ -977,7 +1058,7 @@ function viewVideo(){
     <div class="eyebrow">Step 1 of 2 &middot; Before the modules</div>
     <h1>${VIDEO_TITLE}</h1>
     <p class="sub">${state.videoDone?'You\u2019ve already unlocked the modules — rewatch freely anytime, and scrub wherever you like.':'Watch this short video to the end to unlock the course modules (about 5 minutes). You can pause anytime — your furthest point is remembered on this device.'}</p>
-    <div class="videobox"><video controls preload="metadata" playsinline><source src="${VIDEO_SRC}" type="video/mp4"></video></div>
+    <div class="videobox"><video controls preload="metadata" playsinline><source src="${VIDEO_SRC}" type="video/mp4"><track kind="captions" src="${VIDEO_CAPTIONS}" srclang="en" label="English"></video></div>
     <div class="gate-status">
       <span class="gate-pill ${state.videoDone?'open':'locked'}" id="gatePill">${state.videoDone?'&#10003; Video watched — modules unlocked':'&#128274; Modules unlock when the video ends'}</span>
       <a class="btn small" id="gateGo" href="#/menu" style="${state.videoDone?'':'display:none'}">Go to modules &rarr;</a>
@@ -1003,9 +1084,10 @@ function viewVideo(){
       setTimeout(()=>{ if(!state.videoDone) pill.innerHTML='&#128274; Modules unlock when the video ends'; }, 2500);
     } else if(video.currentTime > state.videoMax){
       state.videoMax = video.currentTime;
-      if(Math.floor(state.videoMax)%5===0) save();
+      if(!viewVideo._lastSave || Date.now()-viewVideo._lastSave > 30000){ save(); viewVideo._lastSave = Date.now(); }
     }
   });
+  video.addEventListener('pause',()=>{ save(); viewVideo._lastSave = Date.now(); });
   video.addEventListener('ended',()=>{
     state.videoDone = true; save();
     pill.className='gate-pill open'; pill.innerHTML='&#10003; Video watched — modules unlocked';
@@ -1075,6 +1157,46 @@ function viewCert(){
     const a=document.createElement('a'); a.download='da-at-work-certificate.png'; a.href=cv.toDataURL('image/png'); a.click();
   });
   return w;
+}
+
+function viewGate(){
+  const v = el(`<div class="gatewrap">
+    <div class="lockicon"><svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="4.5" y="10" width="15" height="10" rx="2.5"/><path d="M8 10V7.5a4 4 0 0 1 8 0V10"/></svg></div>
+    <h1>Disability Awareness@Work</h1>
+    <p class="sub">This course is for participating organisations. Enter your organisation\u2019s access code to begin.</p>
+    <div class="gate-err" id="gateErr">That code isn\u2019t recognised. Please check with your HR team or programme administrator for your organisation\u2019s access code.</div>
+    <input id="codeInput" type="password" autocomplete="off" placeholder="Access code" aria-label="Access code">
+    <button class="btn" id="codeGo" style="width:100%;justify-content:center">Unlock the course &rarr;</button>
+    <p class="gate-note">Your device stays unlocked for ${ACCESS_DAYS} days. Nothing you enter is sent anywhere \u2014 the check happens on this device.</p>
+  </div>`);
+  const input = v.querySelector('#codeInput'), err = v.querySelector('#gateErr');
+  function attempt(){
+    const h = codeHash(input.value||'');
+    if(input.value && ACCESS_CODES.includes(h)){
+      state.access = {codeHash:h, grantedAt:Date.now()}; save();
+      location.hash = '#/'; render();
+    } else {
+      err.classList.add('show'); input.value=''; input.focus();
+    }
+  }
+  v.querySelector('#codeGo').addEventListener('click',attempt);
+  input.addEventListener('keydown',e=>{ if(e.key==='Enter') attempt(); });
+  setTimeout(()=>input.focus(),50);
+  return v;
+}
+
+function viewSetCode(){
+  const v = el(`<div class="codegen">
+    <h1 style="color:var(--deep);font-size:1.6rem;margin-bottom:8px">Access code generator</h1>
+    <p class="sub" style="color:var(--ink-soft);margin-bottom:18px">Administrator utility. Type a new access code to generate its config line, then paste that line into the <strong>ACCESS_CODES</strong> list near the top of this file. Delete a line to revoke that organisation\u2019s access.</p>
+    <input id="genInput" type="text" autocomplete="off" placeholder="New access code" aria-label="New access code" style="width:100%;border:1.5px solid var(--line);border-radius:12px;padding:14px 16px;font-family:inherit;font-size:1rem;background:var(--card)">
+    <code id="genOut">Config line appears here\u2026</code>
+  </div>`);
+  const inp = v.querySelector('#genInput'), out = v.querySelector('#genOut');
+  inp.addEventListener('input',()=>{
+    out.textContent = inp.value.trim() ? `'${codeHash(inp.value)}', // ${inp.value.trim()} \u2014 add org label, then remove this comment` : 'Config line appears here\u2026';
+  });
+  return v;
 }
 
 function viewCover(){
@@ -1158,6 +1280,8 @@ function render(){
   const h = location.hash.replace('#/','');
   app.innerHTML='';
   let view;
+  if(h==='setcode'){ app.appendChild(viewSetCode()); updateRibbon(); window.scrollTo({top:0}); return; }
+  if(!accessValid()){ app.appendChild(viewGate()); updateRibbon(); window.scrollTo({top:0}); return; }
   if(h==='' ) view = viewCover();
   else if(h==='video') view = viewVideo();
   else if(h==='cert') view = viewCert();
@@ -1170,6 +1294,13 @@ function render(){
   app.focus({preventScroll:true});
 }
 window.addEventListener('hashchange',render);
+document.getElementById('resetProgress').addEventListener('click',()=>{
+  if(!confirm('Reset all progress on this device? This clears module completion, quiz score, reflections and the access unlock. This cannot be undone.')) return;
+  if(store){ try{ store.removeItem('wa_state_v1'); }catch(e){} }
+  state.completed={}; state.reflections={}; state.confidenceStart=null; state.confidenceEnd=null;
+  state.quizScore=null; state.videoDone=false; state.videoMax=0; state.learnerName=''; state.access=null;
+  location.hash='#/'; render();
+});
 render();
 </script>
 </body>
