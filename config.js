@@ -5,7 +5,7 @@ window.DAW_CONFIG = {
   videoSrc: 'intro.mp4',
   videoTitle: 'A message from Singapore before you begin',
   videoCaptions: 'intro.vtt',
-  videoSkip: false,
+  videoSkip: true,
   logoMain: 'inclusionedge.png',
   reportCC: 'completions@inclusionedge.com',
   goatcounter: '',
