@@ -67,6 +67,10 @@ main{max-width:var(--maxw);margin:0 auto;padding:34px 20px 90px}
 
 /* ---------- cover ---------- */
 .cover{padding-top:26px}
+.logo-row{display:flex;gap:22px;align-items:center;margin-bottom:22px;flex-wrap:wrap}
+.logo-row img{height:42px;width:auto;max-width:180px;object-fit:contain}
+.cert-sheet .logo-row{justify-content:center;margin:0 0 18px}
+.cert-sheet .logo-row img{height:48px}
 .eyebrow{font-size:.78rem;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--teal);margin-bottom:14px}
 .cover h1{font-size:clamp(2.1rem,6vw,3.3rem);font-weight:800;color:var(--deep);margin-bottom:8px}
 .cover h1 .accent{background:var(--spectrum);-webkit-background-clip:text;background-clip:text;color:transparent}
@@ -269,6 +273,27 @@ footer.site .band{height:6px;border-radius:99px;background:var(--spectrum);margi
   main{padding:0;max-width:none}
   .cert-sheet{border-width:4px;box-shadow:none;margin:0;page-break-inside:avoid}
 }
+/* ---------- admin panel ---------- */
+.admin{max-width:720px;margin:0 auto}
+.admin h1{color:var(--deep);font-size:1.7rem;margin-bottom:4px}
+.admin .sub{color:var(--ink-soft);margin-bottom:22px;font-size:.95rem}
+.admin fieldset{border:1px solid var(--line);border-radius:var(--radius);padding:18px;margin:0 0 18px;background:var(--card)}
+.admin legend{font-family:"Bricolage Grotesque";font-weight:800;color:var(--deep);padding:0 8px;font-size:1.02rem}
+.admin label{display:block;font-size:.82rem;font-weight:700;color:var(--ink-soft);margin:12px 0 5px}
+.admin input[type=text],.admin input[type=email],.admin input[type=number],.admin input[type=url]{width:100%;border:1.5px solid var(--line);border-radius:10px;padding:10px 12px;font-family:inherit;font-size:.95rem;background:#fff}
+.admin .row2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.admin .toggle{display:flex;align-items:center;gap:10px;margin-top:12px}
+.admin .toggle input{width:auto}
+.admin .toggle label{margin:0;font-size:.92rem;color:var(--ink)}
+.org-tbl{width:100%;border-collapse:collapse;margin-top:10px;font-size:.85rem}
+.org-tbl th{text-align:left;color:var(--ink-soft);font-size:.72rem;text-transform:uppercase;letter-spacing:.08em;padding:6px 8px;border-bottom:1px solid var(--line)}
+.org-tbl td{padding:6px 8px;border-bottom:1px solid var(--line);vertical-align:top}
+.org-tbl input{width:100%;border:1px solid var(--line);border-radius:8px;padding:7px 9px;font-family:inherit;font-size:.85rem}
+.org-tbl .del{background:var(--coral-soft);color:#A13E28;border:none;border-radius:8px;padding:7px 10px;font-weight:700;font-size:.8rem}
+.admin .addrow{background:var(--lime-soft);color:#4C6B1E;border:none;border-radius:10px;padding:9px 16px;font-weight:700;font-size:.85rem;margin-top:10px}
+.admin .cfg-out{background:var(--ink);color:#DDE7F5;border-radius:12px;padding:16px;font-family:ui-monospace,Menlo,monospace;font-size:.78rem;white-space:pre-wrap;word-break:break-word;max-height:280px;overflow:auto;margin-top:12px}
+.admin .hintline{font-size:.8rem;color:var(--ink-soft);margin-top:6px}
+
 /* ---------- access gate ---------- */
 .gatewrap{max-width:420px;margin:8vh auto 0;text-align:center}
 .gatewrap .lockicon{width:64px;height:64px;border-radius:18px;background:var(--card);border:1px solid var(--line);display:inline-flex;align-items:center;justify-content:center;color:var(--teal);box-shadow:var(--shadow);margin-bottom:18px}
@@ -351,8 +376,9 @@ footer.site .band{height:6px;border-radius:99px;background:var(--spectrum);margi
 <footer class="site">
   <div class="band"></div>
   <p style="margin-bottom:10px"><button id="resetProgress" style="background:none;border:1px solid var(--line);border-radius:99px;padding:5px 14px;font-size:.78rem;color:var(--ink-soft);font-weight:700">Reset my progress</button></p>
-  <p><strong>Pilot prototype.</strong> Content distilled from SG Enable's Disability Awareness Talk and related materials. All statistics and scheme details are to be verified with SG Enable before launch. This page is set in Atkinson Hyperlegible, a typeface designed for readers with low vision — a small example of designing for inclusion by default.</p>
+  <p>&copy; InclusionEdge &middot; <strong>Disability Awareness@Work</strong> &middot; aligned to Singapore&rsquo;s Enabling Masterplan 2030. Your progress, reflections and name stay on your device; where usage counting is enabled, only anonymous page-view counts are collected (no cookies, no personal data). Set in Atkinson Hyperlegible, a typeface designed for readers with low vision &mdash; inclusive design, by default.</p>
 </footer>
+<script src="config.js"></script>
 <script>
 /* =========================================================
    Working Alongside — self-contained course engine.
@@ -362,22 +388,46 @@ footer.site .band{height:6px;border-radius:99px;background:var(--spectrum);margi
    downloadable as evidence of completion.
 ========================================================= */
 
-/* ------- DEPLOYMENT CONFIG ------- */
-const VIDEO_SRC   = 'intro.mp4';   // your MP4, placed in the same folder as this HTML file
-const VIDEO_TITLE = 'A message before you begin';
-const VIDEO_CAPTIONS = 'intro.vtt'; // optional WebVTT captions file beside the MP4; ignored if absent
+/* ------- CONFIGURATION -------
+   All deployment settings live in an external file, config.js, which loads
+   before this script. Manage it visually via the #/admin panel, which lets
+   you download a fresh config.js to drop into your deployment folder.
+   If config.js is missing or incomplete, the safe DEFAULTS below apply, so
+   the course never breaks. Do not hand-edit settings here — edit config.js
+   (or regenerate it from #/admin).                                        */
+const DEFAULT_CONFIG = {
+  videoSrc: 'intro.mp4',
+  videoTitle: 'A message before you begin',
+  videoCaptions: 'intro.vtt',
+  videoSkip: false,              // false = must watch to unlock (soft seek-lock); true = free scrubbing
+  logoMain: 'inclusionedge.png', // InclusionEdge logo beside this file; '' for none
+  reportCC: '',                  // CC'd on every completion report; '' to disable
+  goatcounter: '',               // your GoatCounter site code; '' disables counting
+  goatcounterUrl: '',            // full dashboard URL for the admin panel link; '' if none
+  accessDays: 30,                // days before a device must re-enter its code
+  nameMandatory: true,           // require a name at the entry gate
+  passThreshold: 10,             // correct answers (out of QUIZ length) needed to complete
+  enableSetcode: false,          // show the #/setcode helper (keep false in client builds)
+  adminHash: '',                 // hashed admin password for #/admin; set via #/adminsetup
+  orgs: [
+    { hash:'1c76617fe62e6f3e', label:'Demo Org', email:'reports@example.com', logo:'' } // DEMO code: inclusion2026
+  ]
+};
+/* merge external config.js (window.DAW_CONFIG) over defaults; ignore junk */
+const CONFIG = Object.assign({}, DEFAULT_CONFIG, (typeof window!=='undefined' && window.DAW_CONFIG && typeof window.DAW_CONFIG==='object') ? window.DAW_CONFIG : {});
+if(!Array.isArray(CONFIG.orgs)) CONFIG.orgs = DEFAULT_CONFIG.orgs;
 
-/* ACCESS CODES
-   One line per organisation. To ADD a code: open #/setcode in your browser,
-   type the new code, and paste the generated line below. To REMOVE an
-   organisation's access: delete its line. Devices re-verify against this
-   list, so removed codes lock out immediately; all codes expire from a
-   device after 30 days and must be re-entered.
-   The line below is a demo code: inclusion2026            */
-const ACCESS_CODES = [
-  '1c76617fe62e6f3e', // DEMO — replace before launch (code: inclusion2026)
-];
-const ACCESS_DAYS = 30;   // days before a device must re-enter the code
+function gcCount(path, event){
+  try{
+    if(!CONFIG.goatcounter) return;
+    if(window.goatcounter && window.goatcounter.count){
+      window.goatcounter.count({path:path, event:!!event});
+    }
+  }catch(e){}
+}
+function currentOrg(){
+  return (state.access && CONFIG.orgs.find(o=>o.hash===state.access.codeHash)) || {label:'',email:'',logo:''};
+}
 
 /* small salted hash — deters casual reading of codes from source */
 function codeHash(str){
@@ -394,8 +444,8 @@ function codeHash(str){
 function accessValid(){
   const a = state.access;
   if(!a || !a.codeHash || !a.grantedAt) return false;
-  if(!ACCESS_CODES.includes(a.codeHash)) return false;              // code was removed
-  if(Date.now() - a.grantedAt > ACCESS_DAYS*24*60*60*1000) return false; // expired
+  if(!CONFIG.orgs.some(o=>o.hash===a.codeHash)) return false;              // code was removed
+  if(Date.now() - a.grantedAt > CONFIG.accessDays*24*60*60*1000) return false; // expired
   return true;
 }
 
@@ -550,7 +600,7 @@ const R = {
   reflect: b => {
     const box = el(`<div class="reflect"><div class="r-label">${ICONS.pen} Pause &amp; reflect</div><h4>${b.q}</h4>
       <textarea aria-label="Your reflection" placeholder="${b.ph||'Type your thoughts here — this stays on your device.'}"></textarea>
-      <div class="r-note">Not saved to any server. Download all your reflections in the final module.</div></div>`);
+      <div class="r-note">Stays on this device \u2014 never sent to any server. Download all your reflections in the final module.</div></div>`);
     const ta = box.querySelector('textarea');
     ta.value = state.reflections[b.key]||'';
     ta.addEventListener('input',()=>{ state.reflections[b.key]={q:b.q,a:ta.value}; save(); });
@@ -650,7 +700,7 @@ const MODULES = [
     {type:'text', html:'<ul class="plain"><li><strong>Describe</strong> the main disability types in Singapore and how each can shape a colleague\u2019s working day. <em>(Module 2)</em></li><li><strong>Apply</strong> respectful, practical etiquette across the five moments that decide recognition \u2014 day one, briefing, meetings, feedback and belonging. <em>(Module 3)</em></li><li><strong>Recognise</strong> the well-meant assumptions that quietly withhold recognition \u2014 in task allocation, performance reads, development and airtime. <em>(Module 4)</em></li></ul>'},
     {type:'callout', kind:'warm', label:'Honest framing', html:'<p>This course will <strong>not</strong> make you an expert on disability \u2014 nobody becomes one in 90 minutes. It aims for something more useful: that you feel <strong>familiar and a little more ready</strong>, know the safe first moves, and know who to turn to when you\u2019re unsure.</p><p>You are not expected to have all the answers. You are expected to not look away.</p>'},
     {type:'confidence', slot:'confidenceStart', q:'Right now, how confident do you feel interacting with and supporting a colleague with a disability?'},
-    {type:'callout', kind:'note', label:'How this course works', html:'<p>Five bite-sized modules, about 90 minutes in total. Take the modules in order, or jump to what you need. Your reflections stay in your browser \u2014 nothing is sent anywhere \u2014 and can be downloaded at the end.</p>'}
+    {type:'callout', kind:'note', label:'How this course works', html:'<p>Five bite-sized modules, about 90 minutes in total. Take the modules in order, or jump to what you need. Your progress, reflections and name stay on this device \u2014 nothing personal is sent anywhere \u2014 and your reflections can be downloaded at the end.</p>'}
   ]
 },
 {
@@ -659,11 +709,7 @@ const MODULES = [
   lede:'Before etiquette comes understanding. Here are the four broad disability types recognised in Singapore, what each can look like across a working day \u2014 and the strengths that come with each.',
   blocks:[
     {type:'text', html:'<p>In Singapore, disability is broadly grouped into four types: <strong>physical disability</strong>, <strong>sensory impairment</strong> (hearing and vision), <strong>intellectual disability</strong> and <strong>autism</strong>. These groupings help plan services and support. They are a starting point for understanding a person \u2014 never a description of one.</p>'},
-    {type:'stats', items:[
-      {n:'34%', l:'have a physical disability \u2014 the largest group among persons with disabilities known to Government'},
-      {n:'19%', l:'have an intellectual disability'},
-      {n:'16%', l:'have hearing loss'}
-    ]},
+    {type:'text', html:'<p>Among persons with disabilities in Singapore, <strong>physical disability is the largest group</strong>, followed by intellectual disability and hearing loss. But a headline figure matters far less than the person in front of you \u2014 so we will spend our time on understanding, not statistics.</p>'},
     {type:'callout', kind:'note', label:'A note on scope', html:'<p>This course covers these four disability types. <strong>Mental health conditions</strong> are a related but distinct area, with separate support and guidance. Much of the respect and communication practice you learn here carries across \u2014 but it is a different topic.</p>'},
     {type:'h2', text:'What you cannot see'},
     {type:'text', html:'<p>Many disabilities are <strong>invisible</strong>. You cannot tell by looking whether a colleague has hearing loss, low vision, or is autistic. Someone may use no cane, no wheelchair, no hearing aid \u2014 and still be navigating a working day you know nothing about.</p><p>And your colleague is <strong>under no obligation to tell you</strong>. Disclosure is a personal decision, often shaped by a real fear of being treated differently. You are not owed an explanation. What you are responsible for is the response when a need does surface \u2014 and the climate that makes it safe to raise one.</p>'},
@@ -907,10 +953,10 @@ const MODULES = [
       {icon:'star', bg:'#F9E9E4', fg:'#C4553B', h:'Do not wait to be asked', p:'Speaking up is hard for anyone who fears being seen as difficult. Notice early. A barrier you spot is a barrier you can raise \u2014 without naming anyone.'}
     ]},
     {type:'callout', kind:'warm', label:'The line to remember', html:'<p><strong>You are not expected to solve this alone. You are expected to notice, to respond with respect, and to know who to call.</strong></p>'},
-    {type:'callout', kind:'note', label:'This was Level 0', html:'<p>This course is a foundation \u2014 awareness, not expertise. Deeper training exists for those who want it or need it in a specific role, including SG Enable\u2019s workshops on recruitment, workplace accommodation, assistive technology and supporting positive behaviour. Ask HR what is available.</p>'},
+    {type:'callout', kind:'note', label:'This was Level 0', html:'<p>This course is a foundation \u2014 awareness, not expertise. Deeper training exists for those who want it or need it in a specific role, including structured workshops on recruitment, workplace accommodation, assistive technology and supporting positive behaviour. Ask HR what is available.</p>'},
 
     {type:'h2', text:'Knowledge check'},
-    {type:'text', html:'<p>Ten questions covering everything in this course. Instant feedback on each. <strong>Full marks are required to complete the course</strong> \u2014 not because this is an exam, but because every one of these moments matters to a real colleague. Retake as often as you like; the answer options are reshuffled each time. Nothing is recorded anywhere.</p>'},
+    {type:'text', html:'<p>Ten questions covering everything in this course. Instant feedback on each. <strong>Full marks are required to complete the course</strong> \u2014 not because this is an exam, but because every one of these moments matters to a real colleague. Retake as often as you like; the answer options are reshuffled each time. Your answers and score stay on this device.</p>'},
     {type:'quiz'},
     {type:'confidence', slot:'confidenceEnd', q:'Now \u2014 how confident do you feel interacting with and supporting a colleague with a disability?', compare:true},
     {type:'h2', text:'Your commitment'},
@@ -984,10 +1030,10 @@ R.quiz = () => {
             const line = scoreCard.querySelector('.verdict-line');
             const actions = scoreCard.querySelector('.cert-actions');
             actions.innerHTML='';
-            if(correct===QUIZ.length){
-              line.innerHTML = '&#127881; <strong>Congratulations — full marks!</strong> The completion requirement is met.<br><span style="font-size:.92rem;color:var(--ink-soft)">Continue below to the self-check and your commitment, then complete the course at the bottom of the page.</span>';
+            if(correct>=passMark()){
+              line.innerHTML = '&#127881; <strong>Congratulations — you passed!</strong> You scored '+correct+' / '+QUIZ.length+' (pass mark '+passMark()+'). The completion requirement is met.<br><span style="font-size:.92rem;color:var(--ink-soft)">Continue below to the self-check and your commitment, then complete the course at the bottom of the page.</span>';
             } else {
-              line.innerHTML = '<strong>Almost there.</strong> Completing this course requires the full '+QUIZ.length+'/'+QUIZ.length+' — review the feedback under each question, then try again. Answer options are reshuffled each attempt.';
+              line.innerHTML = '<strong>Almost there.</strong> You scored '+correct+' / '+QUIZ.length+'. Completing this course requires at least '+passMark()+' / '+QUIZ.length+' — review the feedback under each question, then try again. Answer options are reshuffled each attempt.';
               const retry = el('<button class="btn">Retake the quiz &#8634;</button>');
               retry.addEventListener('click',()=>{
                 build();
@@ -1017,16 +1063,17 @@ R.quiz = () => {
 /* ---------- views ---------- */
 /* ---------- completion & certificate helpers ---------- */
 function allModulesDone(){ return MODULES.every(m=>state.completed[m.id]); }
-function certEligible(){ return allModulesDone() && state.quizScore===QUIZ.length; }
+function passMark(){ return Math.min((CONFIG.passThreshold|0)||QUIZ.length, QUIZ.length); }
+function certEligible(){ return allModulesDone() && (state.quizScore||0) >= passMark(); }
 
 function m5GateNode(){
   const prevDone = MODULES.filter(m=>m.id!=='m5').every(m=>state.completed[m.id]);
-  const full = state.quizScore===QUIZ.length;
+  const full = (state.quizScore||0) >= passMark();
   const w = el(`<div id="m5gate" class="callout ${certEligible()?'key':'warm'}">
     <span class="co-label">Course completion status</span>
     <ul class="cert-reqs">
       <li><span class="req-dot ${prevDone?'met':'unmet'}">${prevDone?'&#10003;':'!'}</span> Modules 1&ndash;4 marked complete ${prevDone?'':' — <em>check the module list</em>'}</li>
-      <li><span class="req-dot ${full?'met':'unmet'}">${full?'&#10003;':'!'}</span> Knowledge check passed with the full ${QUIZ.length}/${QUIZ.length} ${full?'':(state.quizScore!==null?` — <em>best so far: ${state.quizScore}/${QUIZ.length}. Retake above.</em>`:' — <em>take the quiz above</em>')}</li>
+      <li><span class="req-dot ${full?'met':'unmet'}">${full?'&#10003;':'!'}</span> Knowledge check passed (at least ${passMark()} of ${QUIZ.length}) ${full?'':(state.quizScore!==null?` — <em>best so far: ${state.quizScore}/${QUIZ.length}. Retake above.</em>`:' — <em>take the quiz above</em>')}</li>
     </ul>
     ${certEligible()?'<p><a class="btn small" href="#/cert">Claim your certificate &rarr;</a></p>': (prevDone&&full ? '<p>Both requirements met — click <strong>Complete the course</strong> in your quiz results above.</p>' : '<p>Meet both requirements, then mark this module complete to unlock your downloadable certificate.</p>')}
   </div>`);
@@ -1036,8 +1083,8 @@ function m5GateNode(){
 function m6Actions(){
   const box = el('<div id="m6actions" style="display:flex;gap:12px;align-items:center;flex-wrap:wrap;justify-content:flex-end"></div>');
   const best = state.quizScore;
-  if(best===QUIZ.length){
-    box.appendChild(el('<span class="score-flag pass">Knowledge check: '+QUIZ.length+' / '+QUIZ.length+' &#10003;</span>'));
+  if((best||0)>=passMark()){
+    box.appendChild(el('<span class="score-flag pass">Passed: '+best+' / '+QUIZ.length+' &#10003;</span>'));
     const fin = el(`<button class="btn">${state.completed['m5']?'View certificate &rarr;':'Complete the course &rarr;'}</button>`);
     fin.addEventListener('click',()=>{
       state.completed['m5']=true; save(); updateRibbon();
@@ -1045,7 +1092,7 @@ function m6Actions(){
     });
     box.appendChild(fin);
   } else {
-    box.appendChild(el(`<span class="score-flag">${best==null?'Quiz not attempted yet':'Your best score: '+best+' / '+QUIZ.length} &nbsp;&middot;&nbsp; ${QUIZ.length}/${QUIZ.length} needed</span>`));
+    box.appendChild(el(`<span class="score-flag">${best==null?'Quiz not attempted yet':'Your best score: '+best+' / '+QUIZ.length} &nbsp;&middot;&nbsp; ${passMark()}/${QUIZ.length} needed</span>`));
     const retry = el(`<button class="btn">${best==null?'Take the quiz &#8593;':'Try the quiz again &#8634;'}</button>`);
     retry.addEventListener('click',()=>{ if(window.__resetQuiz) window.__resetQuiz(best!=null); });
     box.appendChild(retry);
@@ -1056,16 +1103,16 @@ function m6Actions(){
 function viewVideo(){
   const v = el(`<div class="videogate">
     <div class="eyebrow">Step 1 of 2 &middot; Before the modules</div>
-    <h1>${VIDEO_TITLE}</h1>
+    <h1>${CONFIG.videoTitle}</h1>
     <p class="sub">${state.videoDone?'You\u2019ve already unlocked the modules — rewatch freely anytime, and scrub wherever you like.':'Watch this short video to the end to unlock the course modules (about 5 minutes). You can pause anytime — your furthest point is remembered on this device.'}</p>
-    <div class="videobox"><video controls preload="metadata" playsinline><source src="${VIDEO_SRC}" type="video/mp4"><track kind="captions" src="${VIDEO_CAPTIONS}" srclang="en" label="English"></video></div>
+    <div class="videobox"><video controls preload="metadata" playsinline><source src="${CONFIG.videoSrc}" type="video/mp4"><track kind="captions" src="${CONFIG.videoCaptions}" srclang="en" label="English"></video></div>
     <div class="gate-status">
       <span class="gate-pill ${state.videoDone?'open':'locked'}" id="gatePill">${state.videoDone?'&#10003; Video watched — modules unlocked':'&#128274; Modules unlock when the video ends'}</span>
       <a class="btn small" id="gateGo" href="#/menu" style="${state.videoDone?'':'display:none'}">Go to modules &rarr;</a>
     </div>
     <div class="gate-fallback" id="gateFallback">
       <div class="callout warm"><span class="co-label">Video unavailable</span>
-      <p>The intro video (<code>${VIDEO_SRC}</code>) could not be loaded. If you\u2019re the course owner, check the file sits in the same folder as this page. Learners: you may continue without it.</p>
+      <p>The intro video (<code>${CONFIG.videoSrc}</code>) could not be loaded. If you\u2019re the course owner, check the file sits in the same folder as this page. Learners: you may continue without it.</p>
       <p style="margin-top:10px"><button class="btn small secondary" id="gateBypass">Continue to modules &rarr;</button></p></div>
     </div>
   </div>`);
@@ -1101,17 +1148,22 @@ function viewVideo(){
 
 function viewCert(){
   if(!certEligible()){
-    const w = el(`<div class="certwrap"><h1 style="color:var(--deep)">Certificate locked</h1><p class="sub" style="color:var(--ink-soft)">Finish all five modules and score full marks on the knowledge check to unlock your certificate.</p></div>`);
+    const w = el(`<div class="certwrap"><h1 style="color:var(--deep)">Certificate locked</h1><p class="sub" style="color:var(--ink-soft)">Finish all five modules and reach the pass mark on the knowledge check to unlock your certificate.</p></div>`);
     w.appendChild(m5GateNode());
     w.appendChild(el(`<p><a class="btn secondary small" href="#/m/5">&larr; Back to Module 5</a></p>`));
     return w;
   }
   const dateStr = new Date().toLocaleDateString('en-SG',{day:'numeric',month:'long',year:'numeric'});
+  const org = currentOrg();
   const w = el(`<div class="certwrap">
     <h1 style="color:var(--deep)">Your certificate</h1>
-    <p class="sub" style="color:var(--ink-soft)">Enter your name as you\u2019d like it to appear, then download as an image or save as PDF to share with HR.</p>
+    <p class="sub" style="color:var(--ink-soft)">Your certificate is ready. The name you entered at the start is shown below \u2014 edit it here if you\u2019d like it to appear differently, and that becomes your saved name.</p>
     <div class="name-row"><input id="certName" aria-label="Your name" placeholder="Your full name" value="${esc(state.learnerName||'')}"><button class="btn small" id="nameApply">Apply</button></div>
     <div class="cert-sheet" id="certSheet">
+      <div class="logo-row">
+        <img src="${CONFIG.logoMain}" alt="InclusionEdge" onerror="this.style.display='none'">
+        ${org.logo?`<img src="${org.logo}" alt="${org.label}" onerror="this.style.display='none'">`:''}
+      </div>
       <div class="band-top"></div>
       <div class="c-eyebrow">Certificate of Completion</div>
       <h2>Disability Awareness@Work</h2>
@@ -1120,21 +1172,40 @@ function viewCert(){
       <div class="c-name" id="cName">${esc(state.learnerName||'________________')}</div>
       <div class="c-line">has completed all five modules of this self-paced course,<br>including two applied case scenarios, and passed the knowledge check.</div>
       <div class="c-meta"><span>Date<br><strong id="cDate">${dateStr}</strong></span><span>Knowledge check<br><strong>${QUIZ.length} / ${QUIZ.length}</strong></span><span>Duration<br><strong>~90 minutes</strong></span></div>
-      <div class="c-foot">Self-issued learner record &middot; pilot prototype &middot; content distilled from SG Enable materials, pending verification</div>
+      <div class="c-foot">Certificate ID: <strong id="cVerify">\u2014</strong> &middot; Issued by InclusionEdge &middot; Disability Awareness@Work</div>
     </div>
     <div class="cert-actions">
-      <button class="btn" id="dlPng">Download certificate</button>
+      <button class="btn" id="dlPng" disabled>Download certificate</button>
+      <button class="btn" id="reportBtn" disabled>Report completion (email + download)</button>
       <a class="btn secondary" href="#/m/5">&larr; Back</a>
     </div>
+    <p class="gate-note" id="nameHint" style="margin-top:10px;color:var(--amber-text);font-weight:700">Enter your name above to enable the buttons.</p>
   </div>`);
   const nameInput = w.querySelector('#certName');
-  const apply = ()=>{ state.learnerName = nameInput.value.trim(); save(); w.querySelector('#cName').textContent = state.learnerName || '________________'; };
+  const dl = w.querySelector('#dlPng'), rp = w.querySelector('#reportBtn'), hint = w.querySelector('#nameHint');
+  function verifyCode(){ return codeHash(state.learnerName+'|'+dateStr+'|10').slice(0,8).toUpperCase(); }
+  const apply = ()=>{
+    state.learnerName = nameInput.value.trim(); save();
+    const has = !!state.learnerName;
+    w.querySelector('#cName').textContent = state.learnerName || '________________';
+    w.querySelector('#cVerify').textContent = has ? verifyCode() : '\u2014';
+    dl.disabled = !has; rp.disabled = !has;
+    hint.style.display = has ? 'none' : '';
+    dl.style.opacity = rp.style.opacity = has ? '1' : '.5';
+  };
   w.querySelector('#nameApply').addEventListener('click',apply);
   nameInput.addEventListener('change',apply);
-  w.querySelector('#dlPng').addEventListener('click',()=>{
-    apply();
+  nameInput.addEventListener('input',apply);
+  apply();
+  function downloadPng(){
+    if(!state.learnerName) return;
+    /* ensure logo images are decoded before we rasterise the certificate */
+    const imgs = [...w.querySelectorAll('.cert-sheet .logo-row img')].filter(i=>i.getAttribute('src') && i.style.display!=='none');
+    Promise.all(imgs.map(i=> (i.complete && i.naturalWidth>0) ? Promise.resolve() : (i.decode?i.decode().catch(()=>{}):new Promise(r=>{i.onload=i.onerror=r;})) )).then(paint);
+    function paint(){
     const cv = document.createElement('canvas'); cv.width=1600; cv.height=1132;
     const x = cv.getContext('2d');
+    if(!x.roundRect){ x.roundRect=function(px,py,w,h,r){ r=Math.min(r,w/2,h/2); this.moveTo(px+r,py); this.arcTo(px+w,py,px+w,py+h,r); this.arcTo(px+w,py+h,px,py+h,r); this.arcTo(px,py+h,px,py,r); this.arcTo(px,py,px+w,py,r); this.closePath(); return this; }; }
     x.fillStyle='#FFFFFF'; x.fillRect(0,0,1600,1132);
     x.strokeStyle='#1E2A3C'; x.lineWidth=6; x.strokeRect(40,40,1520,1052);
     const g = x.createLinearGradient(560,0,1040,0);
@@ -1153,10 +1224,183 @@ function viewCert(){
     x.font='700 30px "Atkinson Hyperlegible", Arial'; x.fillStyle='#0F3568';
     x.fillText('Date: '+dateStr+'      Knowledge check: '+QUIZ.length+' / '+QUIZ.length+'      Duration: ~90 minutes', 800, 800);
     x.fillStyle='#4A5A70'; x.font='20px "Atkinson Hyperlegible", Arial';
-    x.fillText('Self-issued learner record \u00B7 pilot prototype \u00B7 content distilled from SG Enable materials, pending verification', 800, 1000);
+    x.fillText('Certificate ID: '+verifyCode()+'  \u00B7  Issued by InclusionEdge  \u00B7  Disability Awareness@Work', 800, 1000);
+    /* logos: draw whichever are already loaded on the page */
+    let lx = 120;
+    w.querySelectorAll('.cert-sheet .logo-row img').forEach(img=>{
+      if(img.complete && img.naturalWidth>0 && img.style.display!=='none'){
+        const lh=64, sc=lh/img.naturalHeight, iw=img.naturalWidth*sc;
+        try{ x.drawImage(img, lx, 80, iw, lh); lx += iw+30; }catch(e){}
+      }
+    });
     const a=document.createElement('a'); a.download='da-at-work-certificate.png'; a.href=cv.toDataURL('image/png'); a.click();
+    }
+  }
+  dl.addEventListener('click',()=>{ if(dl.disabled) return; downloadPng(); gcCount('complete-'+(org.label||'unnamed').replace(/\s+/g,'-')+'-download', true); });
+  rp.addEventListener('click',()=>{
+    if(rp.disabled) return;
+    downloadPng();
+    const subject = 'Course Completion \u2014 Disability Awareness@Work ['+(org.label||'Unspecified')+']';
+    const isoDate = new Date().toISOString().slice(0,10);
+    const body = [
+      'Dear HR,','',
+      'I have completed the Disability Awareness@Work eLearning course.','',
+      'Name: '+state.learnerName,
+      'Organisation: '+(org.label||'\u2014'),
+      'Date of completion: '+dateStr,
+      'Knowledge check: '+QUIZ.length+' / '+QUIZ.length,
+      'Verification code: '+verifyCode(),'',
+      'Record: '+(org.label||'Unspecified')+' | '+state.learnerName+' | '+isoDate+' | '+state.quizScore+'/'+QUIZ.length+' | '+verifyCode(),'',
+      'My certificate (PNG) is attached \u2014 please find the downloaded file \u201cda-at-work-certificate.png\u201d.','',
+      'Regards,',state.learnerName
+    ].join('\n');
+    gcCount('complete-'+(org.label||'unnamed').replace(/\s+/g,'-')+'-report', true);
+    const ccParam = CONFIG.reportCC ? '&cc='+encodeURIComponent(CONFIG.reportCC) : '';
+    window.location.href = 'mailto:'+encodeURIComponent(org.email||'')+'?subject='+encodeURIComponent(subject)+ccParam+'&body='+encodeURIComponent(body);
   });
   return w;
+}
+
+function sanitizeVal(v){ return String(v==null?'':v).replace(/\\/g,'\\\\').replace(/'/g,"\\'"); }
+function buildConfigJs(c){
+  const orgLines = c.orgs.map(o=>`    { hash:'${sanitizeVal(o.hash)}', label:'${sanitizeVal(o.label)}', email:'${sanitizeVal(o.email)}', logo:'${sanitizeVal(o.logo)}' }`).join(',\n');
+  return `/* config.js — Disability Awareness@Work deployment settings\n   Generated by the admin panel. Place beside index.html and upload to your\n   deployment. Editing here by hand is fine too; keep the structure intact. */\nwindow.DAW_CONFIG = {\n  videoSrc: '${sanitizeVal(c.videoSrc)}',\n  videoTitle: '${sanitizeVal(c.videoTitle)}',\n  videoCaptions: '${sanitizeVal(c.videoCaptions)}',\n  videoSkip: ${!!c.videoSkip},\n  logoMain: '${sanitizeVal(c.logoMain)}',\n  reportCC: '${sanitizeVal(c.reportCC)}',\n  goatcounter: '${sanitizeVal(c.goatcounter)}',\n  goatcounterUrl: '${sanitizeVal(c.goatcounterUrl)}',\n  accessDays: ${parseInt(c.accessDays)||30},\n  nameMandatory: ${!!c.nameMandatory},\n  passThreshold: ${parseInt(c.passThreshold)||10},\n  enableSetcode: ${!!c.enableSetcode},\n  adminHash: '${sanitizeVal(c.adminHash)}',\n  orgs: [\n${orgLines}\n  ]\n};\n`;
+}
+
+function viewAdminSetup(){
+  const v = el(`<div class="codegen">
+    <h1 style="color:var(--deep);font-size:1.6rem;margin-bottom:8px">Admin password setup</h1>
+    <p class="sub" style="color:var(--ink-soft);margin-bottom:18px">Type a new admin password to generate its hash. Copy the hash into <strong>adminHash</strong> in your config.js (or paste it into the Admin panel\u2019s Security field). Only the hash is stored \u2014 never the password itself.</p>
+    <input id="apInput" type="text" autocomplete="off" placeholder="New admin password" aria-label="New admin password" style="width:100%;border:1.5px solid var(--line);border-radius:12px;padding:14px 16px;font-family:inherit;font-size:1rem;background:var(--card)">
+    <code id="apOut" style="display:block;background:var(--card);border:1px solid var(--line);border-radius:10px;padding:12px;margin-top:10px;font-size:.85rem;word-break:break-all">adminHash appears here\u2026</code>
+  </div>`);
+  const inp=v.querySelector('#apInput'), out=v.querySelector('#apOut');
+  inp.addEventListener('input',()=>{ out.textContent = inp.value.trim() ? codeHash(inp.value) : 'adminHash appears here\u2026'; });
+  return v;
+}
+
+function viewAdmin(){
+  /* password gate for the panel */
+  if(!viewAdmin._ok){
+    const g = el(`<div class="gatewrap">
+      <div class="lockicon"><svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="4.5" y="10" width="15" height="10" rx="2.5"/><path d="M8 10V7.5a4 4 0 0 1 8 0V10"/></svg></div>
+      <h1>Admin</h1><p class="sub">Enter the admin password.</p>
+      <div class="gate-err" id="aerr">Incorrect password.</div>
+      <input id="apw" type="password" autocomplete="off" placeholder="Admin password" aria-label="Admin password">
+      <button class="btn" id="apwGo" style="width:100%;justify-content:center">Open panel &rarr;</button>
+      <p class="gate-note">No admin password is set yet? Visit <code>#/adminsetup</code> to create one, then add it to config.js.</p>
+    </div>`);
+    const pw=g.querySelector('#apw');
+    function tryPw(){
+      if(CONFIG.adminHash && codeHash(pw.value)===CONFIG.adminHash){ viewAdmin._ok=true; render(); }
+      else { g.querySelector('#aerr').classList.add('show'); pw.value=''; pw.focus(); }
+    }
+    g.querySelector('#apwGo').addEventListener('click',tryPw);
+    pw.addEventListener('keydown',e=>{ if(e.key==='Enter') tryPw(); });
+    setTimeout(()=>pw.focus(),50);
+    return g;
+  }
+
+  /* working copy of current config */
+  const c = JSON.parse(JSON.stringify(CONFIG));
+  c.orgs = c.orgs.map(o=>Object.assign({hash:'',label:'',email:'',logo:''},o));
+  const v = el(`<div class="admin">
+    <h1>Admin configuration</h1>
+    <p class="sub">Edit settings, then download a fresh <strong>config.js</strong> and upload it beside index.html. Changes take effect for all learners on their next load. Nothing here is saved automatically.</p>
+
+    <fieldset><legend>Video</legend>
+      <div class="row2"><div><label>Video file</label><input type="text" data-k="videoSrc" value="${c.videoSrc}"></div><div><label>Captions file (.vtt)</label><input type="text" data-k="videoCaptions" value="${c.videoCaptions}"></div></div>
+      <label>Video screen title</label><input type="text" data-k="videoTitle" value="${c.videoTitle}">
+      <div class="toggle"><input type="checkbox" id="t-skip" data-k="videoSkip" ${c.videoSkip?'checked':''}><label for="t-skip">Allow video skipping (off = must watch to unlock)</label></div>
+    </fieldset>
+
+    <fieldset><legend>Completion</legend>
+      <label>Pass mark \u2014 correct answers out of ${QUIZ.length} needed</label>
+      <input type="number" min="1" max="${QUIZ.length}" data-k="passThreshold" value="${c.passThreshold}">
+      <p class="hintline">The knowledge check has ${QUIZ.length} questions. Set how many must be correct to complete the course.</p>
+    </fieldset>
+
+    <fieldset><legend>Branding</legend>
+      <label>InclusionEdge logo file</label><input type="text" data-k="logoMain" value="${c.logoMain}">
+      <p class="hintline">Per-organisation logos are set in the Organisations table below.</p>
+    </fieldset>
+
+    <fieldset><legend>Reporting &amp; analytics</legend>
+      <label>Completion report CC (your compilation inbox)</label><input type="email" data-k="reportCC" value="${c.reportCC}">
+      <div class="row2"><div><label>GoatCounter site code</label><input type="text" data-k="goatcounter" value="${c.goatcounter}"></div><div><label>GoatCounter dashboard URL</label><input type="url" data-k="goatcounterUrl" value="${c.goatcounterUrl}"></div></div>
+      <p class="hintline" id="gcLink"></p>
+    </fieldset>
+
+    <fieldset><legend>Access</legend>
+      <div class="row2"><div><label>Access valid for (days)</label><input type="number" min="1" data-k="accessDays" value="${c.accessDays}"></div><div class="toggle" style="margin-top:34px"><input type="checkbox" id="t-name" data-k="nameMandatory" ${c.nameMandatory?'checked':''}><label for="t-name">Require name at entry</label></div></div>
+      <div class="toggle"><input type="checkbox" id="t-setcode" data-k="enableSetcode" ${c.enableSetcode?'checked':''}><label for="t-setcode">Enable #/setcode helper (keep OFF in client builds)</label></div>
+    </fieldset>
+
+    <fieldset><legend>Organisations</legend>
+      <table class="org-tbl"><thead><tr><th>Organisation</th><th>Access code</th><th>HR email</th><th>Logo file</th><th></th></tr></thead><tbody id="orgBody"></tbody></table>
+      <button class="addrow" id="addOrg">+ Add organisation</button>
+      <p class="hintline">Type a plain access code \u2014 it is hashed automatically when you generate the config. Existing codes show as \u201c(set)\u201d; leave them to keep, or type a new code to replace.</p>
+    </fieldset>
+
+    <fieldset><legend>Security</legend>
+      <label>Admin password hash</label><input type="text" data-k="adminHash" value="${c.adminHash}">
+      <p class="hintline">Generate a new one at <code>#/adminsetup</code>. Changing this changes the password for this panel.</p>
+    </fieldset>
+
+    <button class="btn" id="genCfg" style="width:100%;justify-content:center">Generate config.js</button>
+    <div class="cfg-out" id="cfgOut" style="display:none"></div>
+    <div class="cert-actions" id="cfgActions" style="display:none;margin-top:12px">
+      <button class="btn" id="dlCfg">Download config.js</button>
+      <button class="btn secondary" id="copyCfg">Copy to clipboard</button>
+    </div>
+  </div>`);
+
+
+  /* GoatCounter dashboard link */
+  const gl=v.querySelector('#gcLink');
+  if(c.goatcounterUrl){ gl.innerHTML='Open your live analytics: <a href="'+c.goatcounterUrl+'" target="_blank" rel="noopener">'+c.goatcounterUrl+'</a>'; }
+  else if(c.goatcounter){ gl.innerHTML='Open your live analytics: <a href="https://'+c.goatcounter+'.goatcounter.com" target="_blank" rel="noopener">'+c.goatcounter+'.goatcounter.com</a>'; }
+  v.querySelector('[data-k=goatcounter]').addEventListener('input',e=>{ const code=e.target.value.trim(); gl.innerHTML = code?('Live analytics: <a href="https://'+code+'.goatcounter.com" target="_blank" rel="noopener">'+code+'.goatcounter.com</a>'):''; });
+
+  /* organisations table */
+  const body=v.querySelector('#orgBody');
+  function orgRow(o){
+    const tr=el(`<tr>
+      <td><input class="o-label" value="${(o.label||'').replace(/"/g,'&quot;')}" placeholder="Org name"></td>
+      <td><input class="o-code" value="" placeholder="${o.hash?'(set — type to change)':'new code'}"></td>
+      <td><input class="o-email" value="${(o.email||'').replace(/"/g,'&quot;')}" placeholder="hr@org.com"></td>
+      <td><input class="o-logo" value="${(o.logo||'').replace(/"/g,'&quot;')}" placeholder="org.png"></td>
+      <td><button class="del">\u2715</button></td>
+    </tr>`);
+    tr._hash = o.hash||'';
+    tr.querySelector('.del').addEventListener('click',()=>tr.remove());
+    body.appendChild(tr);
+  }
+  c.orgs.forEach(orgRow);
+  v.querySelector('#addOrg').addEventListener('click',()=>orgRow({hash:'',label:'',email:'',logo:''}));
+
+  /* generate */
+  function collect(){
+    v.querySelectorAll('[data-k]').forEach(inp=>{
+      const k=inp.dataset.k;
+      if(inp.type==='checkbox') c[k]=inp.checked;
+      else if(inp.type==='number') c[k]=parseInt(inp.value)||0;
+      else c[k]=inp.value.trim();
+    });
+    c.orgs = [...body.querySelectorAll('tr')].map(tr=>{
+      const code=tr.querySelector('.o-code').value.trim();
+      return { hash: code?codeHash(code):tr._hash, label:tr.querySelector('.o-label').value.trim(), email:tr.querySelector('.o-email').value.trim(), logo:tr.querySelector('.o-logo').value.trim() };
+    }).filter(o=>o.hash);
+    return c;
+  }
+  v.querySelector('#genCfg').addEventListener('click',()=>{
+    const txt = buildConfigJs(collect());
+    v.querySelector('#cfgOut').textContent = txt; v.querySelector('#cfgOut').style.display='block';
+    v.querySelector('#cfgActions').style.display='flex';
+    v.querySelector('#dlCfg').onclick=()=>{ const b=new Blob([txt],{type:'text/javascript'}); const a=document.createElement('a'); a.href=URL.createObjectURL(b); a.download='config.js'; a.click(); URL.revokeObjectURL(a.href); };
+    v.querySelector('#copyCfg').onclick=()=>{ (navigator.clipboard&&navigator.clipboard.writeText(txt)); };
+  });
+  return v;
 }
 
 function viewGate(){
@@ -1164,24 +1408,31 @@ function viewGate(){
     <div class="lockicon"><svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="4.5" y="10" width="15" height="10" rx="2.5"/><path d="M8 10V7.5a4 4 0 0 1 8 0V10"/></svg></div>
     <h1>Disability Awareness@Work</h1>
     <p class="sub">This course is for participating organisations. Enter your organisation\u2019s access code to begin.</p>
-    <div class="gate-err" id="gateErr">That code isn\u2019t recognised. Please check with your HR team or programme administrator for your organisation\u2019s access code.</div>
+    <div class="gate-err" id="gateErr"></div>
+    <input id="nameInput" type="text" autocomplete="name" placeholder="Your name" aria-label="Your name" style="margin-bottom:12px">
     <input id="codeInput" type="password" autocomplete="off" placeholder="Access code" aria-label="Access code">
-    <button class="btn" id="codeGo" style="width:100%;justify-content:center">Unlock the course &rarr;</button>
-    <p class="gate-note">Your device stays unlocked for ${ACCESS_DAYS} days. Nothing you enter is sent anywhere \u2014 the check happens on this device.</p>
+    <button class="btn" id="codeGo" style="width:100%;justify-content:center">Enter the course &rarr;</button>
+    <p class="gate-note">Enter your name as it should appear on your certificate (you can adjust it later). Your device stays unlocked for ${CONFIG.accessDays} days. <strong>Your name stays on this device and is used only for your certificate</strong> \u2014 the access check happens here, on your device, and nothing you type is sent anywhere.</p>
   </div>`);
-  const input = v.querySelector('#codeInput'), err = v.querySelector('#gateErr');
+  const nameF = v.querySelector('#nameInput'), input = v.querySelector('#codeInput'), err = v.querySelector('#gateErr');
+  nameF.value = state.learnerName || '';
+  function fail(msg){ err.textContent = msg; err.classList.add('show'); }
   function attempt(){
+    const nm = (nameF.value||'').trim();
     const h = codeHash(input.value||'');
-    if(input.value && ACCESS_CODES.includes(h)){
-      state.access = {codeHash:h, grantedAt:Date.now()}; save();
-      location.hash = '#/'; render();
-    } else {
-      err.classList.add('show'); input.value=''; input.focus();
-    }
+    const org = CONFIG.orgs.find(o=>o.hash===h);
+    if(!nm){ fail('Please enter your name to continue.'); nameF.focus(); return; }
+    if(!input.value || !org){ fail('That code isn\u2019t recognised. Please check with your HR team or programme administrator for your organisation\u2019s access code.'); input.value=''; input.focus(); return; }
+    state.learnerName = nm;
+    state.access = {codeHash:h, grantedAt:Date.now()}; save();
+    gcCount('unlock-'+(org.label||'unnamed').replace(/\s+/g,'-'), true);
+    gcCount('attempt-'+(org.label||'unnamed').replace(/\s+/g,'-'), true);
+    location.hash = '#/'; render();
   }
   v.querySelector('#codeGo').addEventListener('click',attempt);
   input.addEventListener('keydown',e=>{ if(e.key==='Enter') attempt(); });
-  setTimeout(()=>input.focus(),50);
+  nameF.addEventListener('keydown',e=>{ if(e.key==='Enter') input.focus(); });
+  setTimeout(()=>nameF.focus(),50);
   return v;
 }
 
@@ -1194,13 +1445,17 @@ function viewSetCode(){
   </div>`);
   const inp = v.querySelector('#genInput'), out = v.querySelector('#genOut');
   inp.addEventListener('input',()=>{
-    out.textContent = inp.value.trim() ? `'${codeHash(inp.value)}', // ${inp.value.trim()} \u2014 add org label, then remove this comment` : 'Config line appears here\u2026';
+    out.textContent = inp.value.trim() ? `{ hash:'${codeHash(inp.value)}', label:'ORG NAME', email:'hr@example.com', logo:'' }, // code: ${inp.value.trim()} \u2014 fill in, then remove this comment` : 'Config line appears here\u2026';
   });
   return v;
 }
 
 function viewCover(){
   return el(`<div class="cover">
+    <div class="logo-row">
+      <img src="${CONFIG.logoMain}" alt="InclusionEdge" onerror="this.style.display='none'">
+      ${currentOrg().logo?`<img src="${currentOrg().logo}" alt="${currentOrg().label}" onerror="this.style.display='none'">`:''}
+    </div>
     <div class="eyebrow">Self-paced eLearning &middot; ~90 minutes &middot; Aligned to Enabling Masterplan 2030</div>
     <h1>Disability Awareness<span class="at">@</span><span class="accent">Work</span></h1>
     <div class="spectrum-band" role="img" aria-label="A spectrum band — the course motif, because disability exists on a spectrum"></div>
@@ -1217,7 +1472,6 @@ function viewCover(){
       <div class="aud-card"><h3>Three real cases</h3><p>A shift briefing. A staff canteen. A colleague whose month has gone wrong. Branching scenarios with consequences \u2014 set in Singapore workplaces.</p></div>
       <div class="aud-card"><h3>No expertise required</h3><p>This is a Level 0 foundation \u2014 awareness, not expertise. You are not expected to have the answers. You are expected to not look away.</p></div>
     </div>
-    <p class="pilot-note">Pilot prototype for review. Distilled from SG Enable\u2019s Disability Awareness Talk (Aug 2024), the DSO/DA narration script, and the eLearning development brief. Statistics and scheme details pending SG Enable verification.</p>
   </div>`);
 }
 
@@ -1236,7 +1490,7 @@ function viewMenu(){
   const elig = certEligible();
   list.appendChild(el(`<a class="mod-item cert-row ${elig?'':'locked'}" href="#/cert">
     <span class="mod-num">&#127942;</span>
-    <span class="mod-body"><h3>Certificate of completion</h3><p>${elig?'Unlocked — enter your name and download':'Unlocks after all modules are done and the quiz is passed with full marks'}</p></span>
+    <span class="mod-body"><h3>Certificate of completion</h3><p>${elig?'Unlocked — enter your name and download':'Unlocks after all modules are done and the quiz is passed'}</p></span>
     <span class="mod-state ${elig?'done':'todo'}">${elig?'Ready':'&#128274; Locked'}</span>
   </a>`));
   return v;
@@ -1280,8 +1534,11 @@ function render(){
   const h = location.hash.replace('#/','');
   app.innerHTML='';
   let view;
-  if(h==='setcode'){ app.appendChild(viewSetCode()); updateRibbon(); window.scrollTo({top:0}); return; }
-  if(!accessValid()){ app.appendChild(viewGate()); updateRibbon(); window.scrollTo({top:0}); return; }
+  if(h==='setcode'){ if(CONFIG.enableSetcode){ app.appendChild(viewSetCode()); } else { location.hash='#/'; return render(); } updateRibbon(); window.scrollTo({top:0}); return; }
+  if(h==='adminsetup'){ app.appendChild(viewAdminSetup()); updateRibbon(); window.scrollTo({top:0}); return; }
+  if(h==='admin'){ app.appendChild(viewAdmin()); updateRibbon(); window.scrollTo({top:0}); return; }
+  if(!accessValid()){ gcCount('/gate'); app.appendChild(viewGate()); updateRibbon(); window.scrollTo({top:0}); return; }
+  gcCount('/'+(h||'cover'));
   if(h==='' ) view = viewCover();
   else if(h==='video') view = viewVideo();
   else if(h==='cert') view = viewCert();
@@ -1294,6 +1551,15 @@ function render(){
   app.focus({preventScroll:true});
 }
 window.addEventListener('hashchange',render);
+/* GoatCounter: load counter script only if a real code is configured */
+(function(){
+  if(!CONFIG.goatcounter) return;
+  const sc=document.createElement('script');
+  sc.async=true; sc.src='https://gc.zgo.at/count.js';
+  sc.dataset.goatcounter='https://'+CONFIG.goatcounter+'.goatcounter.com/count';
+  sc.dataset.goatcounterSettings='{"no_onload": true}';
+  document.head.appendChild(sc);
+})();
 document.getElementById('resetProgress').addEventListener('click',()=>{
   if(!confirm('Reset all progress on this device? This clears module completion, quiz score, reflections and the access unlock. This cannot be undone.')) return;
   if(store){ try{ store.removeItem('wa_state_v1'); }catch(e){} }
