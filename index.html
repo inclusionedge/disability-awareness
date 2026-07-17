@@ -123,6 +123,9 @@ main{max-width:var(--maxw);margin:0 auto;padding:34px 20px 90px}
 .callout.key{background:#E8EFF9;border-color:#C3D4EE}.callout.key .co-label{color:var(--teal)}
 .callout.warm{background:var(--mango-soft);border-color:#EFD9AE}.callout.warm .co-label{color:var(--amber-text)}
 .callout.note{background:var(--card);border-color:var(--line)}.callout.note .co-label{color:var(--ink-soft)}
+.callout.dyk{background:linear-gradient(180deg,#EEF3FB,#F6F9FD);border-color:#C3D4EE;position:relative;padding-left:52px}
+.callout.dyk .co-label{color:var(--deep)}
+.callout.dyk::before{content:'';position:absolute;left:16px;top:18px;width:24px;height:24px;border-radius:50%;background:var(--deep);background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 24 24' fill='none' stroke='%23fff' stroke-width='3' stroke-linecap='round'%3E%3Cpath d='M12 3a6 6 0 0 1 4 10.5c-.8.7-1 1.5-1 2.5H9c0-1-.2-1.8-1-2.5A6 6 0 0 1 12 3Z'/%3E%3Cpath d='M10 19h4'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:center}
 
 .quote{border-left:5px solid;border-image:var(--spectrum) 1;padding:6px 0 6px 20px;margin:24px 0;font-size:1.15rem;font-family:"Bricolage Grotesque";font-weight:600;color:var(--deep)}
 .quote cite{display:block;font-family:"Atkinson Hyperlegible";font-weight:400;font-style:normal;font-size:.86rem;color:var(--ink-soft);margin-top:8px}
@@ -137,6 +140,27 @@ main{max-width:var(--maxw);margin:0 auto;padding:34px 20px 90px}
 .tile h4{font-size:.98rem;color:var(--deep);margin-bottom:4px;display:flex;align-items:center;gap:8px}
 .tile p{font-size:.86rem;color:var(--ink-soft)}
 .tile .ticon{width:30px;height:30px;border-radius:9px;display:inline-flex;align-items:center;justify-content:center;flex:0 0 30px}
+
+/* tabs (future block type) */
+.tabs{border:1px solid var(--line);border-radius:var(--radius);background:var(--card);margin:20px 0;overflow:hidden;box-shadow:var(--shadow)}
+.tabs-head{display:flex;border-bottom:1px solid var(--line);background:var(--mist)}
+.tabs-head button{flex:1;border:none;background:none;padding:14px 12px;font-family:"Bricolage Grotesque";font-weight:700;font-size:.92rem;color:var(--ink-soft);border-bottom:3px solid transparent}
+.tabs-head button[aria-selected=true]{color:var(--deep);border-bottom-color:var(--teal);background:var(--card)}
+.tabs-body{padding:18px}
+.tabs-body h5{font-size:.8rem;letter-spacing:.08em;text-transform:uppercase;color:var(--teal);margin:12px 0 6px}
+.tabs-body ul{margin-left:20px}.tabs-body li{margin-bottom:6px}
+
+/* carousel (future block type) */
+.carousel{margin:22px 0}
+.carousel-stage{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);padding:22px;box-shadow:var(--shadow);min-height:120px}
+.carousel-tag{display:inline-block;background:var(--deep);color:#fff;font-weight:800;font-size:.76rem;letter-spacing:.08em;border-radius:99px;padding:4px 14px;margin-bottom:12px}
+.carousel-stage h4{font-size:1.15rem;color:var(--deep);margin-bottom:8px}
+.carousel-nav{display:flex;align-items:center;justify-content:center;gap:14px;margin-top:16px}
+.carousel-nav button{width:40px;height:40px;border-radius:50%;border:1.5px solid var(--line);background:var(--card);font-size:1.1rem;color:var(--deep)}
+.carousel-nav button:disabled{opacity:.35}
+.carousel-dots{display:flex;gap:8px}
+.carousel-dots span{width:10px;height:10px;border-radius:50%;background:var(--line)}
+.carousel-dots span.on{background:var(--teal)}
 
 /* accordion */
 .acc{border:1px solid var(--line);border-radius:var(--radius);background:var(--card);margin:12px 0;overflow:hidden;box-shadow:var(--shadow)}
@@ -234,6 +258,16 @@ main{max-width:var(--maxw);margin:0 auto;padding:34px 20px 90px}
 /* quiz results + module footer */
 .score-card{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);padding:24px;text-align:center;margin:24px 0;box-shadow:var(--shadow)}
 .score-card .big{font-family:"Bricolage Grotesque";font-weight:800;font-size:2.6rem;color:var(--teal)}
+.dial-wrap{display:flex;justify-content:center;margin:6px 0 4px}
+.dial{position:relative;width:200px;height:200px}
+.dial svg{transform:rotate(-90deg)}
+.dial .track{fill:none;stroke:#E1E8F2;stroke-width:14}
+.dial .fill{fill:none;stroke-width:14;stroke-linecap:round;transition:stroke-dashoffset 1s cubic-bezier(.4,0,.2,1)}
+.dial .pass-tick{stroke:var(--ink-soft);stroke-width:2}
+.dial-center{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center}
+.dial-center .pct{font-family:"Bricolage Grotesque";font-weight:800;font-size:2.4rem;line-height:1}
+.dial-center .raw{font-size:.82rem;color:var(--ink-soft);margin-top:4px}
+.dial-legend{font-size:.78rem;color:var(--ink-soft);text-align:center;margin-top:2px}
 .lesson-foot{margin-top:52px;border-top:1px solid var(--line);padding-top:24px;display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap;align-items:center}
 .done-flag{font-weight:700;color:#4C6B1E;background:var(--lime-soft);border-radius:99px;padding:8px 18px;font-size:.9rem}
 .score-flag{font-weight:800;color:#A13E28;background:var(--coral-soft);border:1.5px solid var(--coral);border-radius:99px;padding:10px 20px;font-size:1rem}
@@ -378,7 +412,23 @@ footer.site .band{height:6px;border-radius:99px;background:var(--spectrum);margi
   <p style="margin-bottom:10px"><button id="resetProgress" style="background:none;border:1px solid var(--line);border-radius:99px;padding:5px 14px;font-size:.78rem;color:var(--ink-soft);font-weight:700">Reset my progress</button></p>
   <p>&copy; InclusionEdge &middot; <strong>Disability Awareness@Work</strong> &middot; aligned to Singapore&rsquo;s Enabling Masterplan 2030. Your progress, reflections and name stay on your device; where usage counting is enabled, only anonymous page-view counts are collected (no cookies, no personal data). Set in Atkinson Hyperlegible, a typeface designed for readers with low vision &mdash; inclusive design, by default.</p>
 </footer>
-<script src="config.js"></script>
+<script>
+/* Load deployment config with cache-busting so an updated config.js is never
+   masked by a stale browser/CDN copy. Falls back silently to built-in
+   defaults if config.js is absent. Uses a synchronous XHR so CONFIG is ready
+   before the main script runs — matching a normal blocking <script> load. */
+(function(){
+  try{
+    var xhr = new XMLHttpRequest();
+    xhr.open('GET', 'config.js?v=' + Date.now(), false); // sync: guarantees order
+    xhr.send();
+    if(xhr.status>=200 && xhr.status<400 && xhr.responseText){
+      // eslint-disable-next-line no-eval
+      (0,eval)(xhr.responseText); // sets window.DAW_CONFIG
+    }
+  }catch(e){ /* file:// or missing config.js — defaults apply */ }
+})();
+</script>
 <script>
 /* =========================================================
    Working Alongside — self-contained course engine.
@@ -544,6 +594,44 @@ const R = {
     return wrap;
   },
 
+  tabs: b => {
+    const wrap = el(`<div class="block"><div class="tabs"><div class="tabs-head" role="tablist"></div><div class="tabs-body"></div></div></div>`);
+    const head = wrap.querySelector('.tabs-head'), bodyEl = wrap.querySelector('.tabs-body');
+    function show(i){
+      [...head.children].forEach((btn,j)=>btn.setAttribute('aria-selected', j===i));
+      bodyEl.innerHTML = b.tabs[i].html;
+    }
+    b.tabs.forEach((t,i)=>{
+      const btn = el(`<button role="tab" aria-selected="${i===0}">${t.label}</button>`);
+      btn.addEventListener('click',()=>show(i));
+      head.appendChild(btn);
+    });
+    show(0);
+    return wrap;
+  },
+
+  carousel: b => {
+    const wrap = el(`<div class="block"><div class="carousel">
+      <div class="carousel-stage" role="group" aria-live="polite"></div>
+      <div class="carousel-nav"><button class="c-prev" aria-label="Previous">&#8249;</button><div class="carousel-dots"></div><button class="c-next" aria-label="Next">&#8250;</button></div>
+    </div></div>`);
+    const stage = wrap.querySelector('.carousel-stage'), dots = wrap.querySelector('.carousel-dots');
+    const prev = wrap.querySelector('.c-prev'), next = wrap.querySelector('.c-next');
+    let i = 0;
+    b.slides.forEach((_,j)=>{ const d=el('<span></span>'); dots.appendChild(d); });
+    function show(n){
+      i = Math.max(0, Math.min(b.slides.length-1, n));
+      const sl = b.slides[i];
+      stage.innerHTML = (sl.tag?`<span class="carousel-tag">${sl.tag}</span>`:'') + (sl.h?`<h4>${sl.h}</h4>`:'') + sl.html;
+      [...dots.children].forEach((d,j)=>d.classList.toggle('on', j===i));
+      prev.disabled = i===0; next.disabled = i===b.slides.length-1;
+    }
+    prev.addEventListener('click',()=>show(i-1));
+    next.addEventListener('click',()=>show(i+1));
+    show(0);
+    return wrap;
+  },
+
   flipcards: b => {
     const wrap = el(`<div class="block"><div class="flipgrid"></div></div>`);
     const grid = wrap.querySelector('.flipgrid');
@@ -688,6 +776,7 @@ const MODULES = [
     {type:'callout', kind:'key', label:'The idea underneath this whole course', html:'<p>It is tempting to think a person is limited by a condition. Far more often, the limit is an <strong>environment designed without that person in mind</strong> \u2014 a meeting where three people talk at once, a document a screen reader cannot open, a briefing full of idioms, a step where a ramp could have been.</p><p>EMP2030 names both the <strong>physical and the mindset barriers</strong> that keep people from participating fully. The good news is blunt: barriers were built by people, so people can take barriers down. Many of the ones that matter most sit inside your control \u2014 no budget, no approval needed.</p>'},
     {type:'h2', text:'This is about all of us'},
     {type:'text', html:'<p>Disability is not a fixed category of other people. Most disability is <strong>acquired</strong> \u2014 a stroke, a road accident, an injury at work, hearing or vision that fades over the years. A colleague with no disability today may well acquire one before retirement. So might you.</p><p>Singapore\u2019s ageing population makes this concrete: by 2030, <strong>one in four Singaporeans will be 65 or older</strong>, and the number of people living with some form of disability will rise with it. The workplace you help build now is the one you may need later.</p>'},
+    {type:'callout', kind:'dyk', label:'Did you know?', html:'<p>Because most disability is acquired rather than present from birth, disability inclusion is one of the few workplace issues that will, statistically, affect nearly everyone \u2014 given a long enough career.</p>'},
     {type:'h2', text:'Where this course sits in the national plan'},
     {type:'text', html:'<p>EMP2030 sets out 29 recommendations across three strategic themes, spanning 14 focal areas. One focal area is where you come in.</p>'},
     {type:'callout', kind:'key', label:'Theme 2 \u00b7 Focal Area 4 \u2014 Inclusive Employment', html:'<p style="font-size:1.06rem;line-height:1.6">\u201cBy 2030, we aspire for persons with disabilities who can work to be <strong>equally recognised for their abilities, knowledge, and skills</strong>, and are able to achieve gainful employment.\u201d</p><p style="margin-top:10px;font-size:.9rem;color:var(--ink-soft)">The goal of Focal Area 4, Enabling Masterplan 2030</p>'},
@@ -713,6 +802,7 @@ const MODULES = [
     {type:'callout', kind:'note', label:'A note on scope', html:'<p>This course covers these four disability types. <strong>Mental health conditions</strong> are a related but distinct area, with separate support and guidance. Much of the respect and communication practice you learn here carries across \u2014 but it is a different topic.</p>'},
     {type:'h2', text:'What you cannot see'},
     {type:'text', html:'<p>Many disabilities are <strong>invisible</strong>. You cannot tell by looking whether a colleague has hearing loss, low vision, or is autistic. Someone may use no cane, no wheelchair, no hearing aid \u2014 and still be navigating a working day you know nothing about.</p><p>And your colleague is <strong>under no obligation to tell you</strong>. Disclosure is a personal decision, often shaped by a real fear of being treated differently. You are not owed an explanation. What you are responsible for is the response when a need does surface \u2014 and the climate that makes it safe to raise one.</p>'},
+    {type:'callout', kind:'dyk', label:'Did you know?', html:'<p>Many disabilities are invisible \u2014 hearing loss, low vision, autism, chronic conditions. The colleague sitting beside you may be navigating a working day you know nothing about, and doing it well.</p>'},
     {type:'h2', text:'The four types \u2014 and the working day'},
     {type:'text', html:'<p>Open each one. For each: what it is, what it can mean at work, and what it often brings to a team.</p>'},
     {type:'accordion', items:[
@@ -869,6 +959,7 @@ const MODULES = [
       {stmt:'If something is wrong, a colleague with a disability will say so.', truth:'myth', why:'New joiners, junior staff, and anyone worried about being labelled difficult rarely speak up \u2014 and a colleague with a disability has often learned, painfully, what happens after speaking up. Noticing, and making it safe to ask, is everyone\u2019s job.'},
       {stmt:'Workplace adjustments are usually expensive.', truth:'myth', why:'Most cost nothing at all: a seating change, written instructions, one voice at a time, captions switched on, a shelf lowered. Where equipment or job redesign is genuinely needed, national funding exists \u2014 and HR is the route to it (Module 5).'}
     ]},
+    {type:'callout', kind:'dyk', label:'Did you know?', html:'<p>One Singapore employer who measured structured work found employees with intellectual disabilities were <strong>30\u201340% more productive</strong> than the average worker in those roles. The right role, matched to the right person, is simply good business.</p>'},
 
     {type:'h2', text:'Four places assumptions do the damage'},
     {type:'text', html:'<p>A colleague can be employed, paid correctly and treated politely \u2014 and still never be recognised. It tends to happen in four places. None of the four feels like discrimination from the inside.</p>'},
@@ -1009,12 +1100,40 @@ const QUIZ = [
   {lo:'Application', q:'Your team is replacing spoken shift briefings with a new mobile app. A colleague on the team is blind. Applying what this course has taught, what is the best first step?', options:['Assume it will be fine \u2014 an app is text, and text can be read aloud by technology','Keep giving spoken briefings to that one colleague, and use the app for everyone else','Ask the colleague whether the app works with a screen reader, and what would work best \u2014 then adjust before rolling it out','Ask HR to purchase specialist software before mentioning the change to anyone'], answer:2, why:'Ask \u2192 Listen \u2192 Adjust, applied to something new. Assuming access invites failure; a separate arrangement for one person is exclusion with extra steps; and going to HR before speaking to your colleague skips the only real expert. Ask first, then involve HR if equipment or funding is genuinely needed.'}
 ];
 
+function renderDial(score, total, pass){
+  const pct = Math.round(score/total*100);
+  const passPct = Math.round(pass/total*100);
+  const passed = score>=pass;
+  const R = 86, C = 2*Math.PI*R;                 // circle geometry
+  const off = C * (1 - pct/100);
+  const passAngle = -90 + (passPct/100)*360;     // tick position on the ring
+  const rad = passAngle*Math.PI/180;
+  const x1 = 100+ (R-9)*Math.cos(rad), y1 = 100+ (R-9)*Math.sin(rad);
+  const x2 = 100+ (R+9)*Math.cos(rad), y2 = 100+ (R+9)*Math.sin(rad);
+  const col = passed ? '#4C9E5F' : '#C4553B';
+  const wrap = el(`<div>
+    <div class="dial-wrap"><div class="dial">
+      <svg width="200" height="200" viewBox="0 0 200 200">
+        <circle class="track" cx="100" cy="100" r="${R}"></circle>
+        <circle class="fill" cx="100" cy="100" r="${R}" stroke="${col}" stroke-dasharray="${C.toFixed(1)}" stroke-dashoffset="${C.toFixed(1)}"></circle>
+        <line class="pass-tick" x1="${x1.toFixed(1)}" y1="${y1.toFixed(1)}" x2="${x2.toFixed(1)}" y2="${y2.toFixed(1)}"></line>
+      </svg>
+      <div class="dial-center"><div class="pct" style="color:${col}">${pct}%</div><div class="raw">${score} / ${total}</div></div>
+    </div></div>
+    <div class="dial-legend">Passing mark: ${passPct}% (${pass} of ${total})</div>
+  </div>`);
+  /* animate the ring fill after paint */
+  const fill = wrap.querySelector('.fill');
+  requestAnimationFrame(()=>{ requestAnimationFrame(()=>{ fill.style.strokeDashoffset = off.toFixed(1); }); });
+  return wrap;
+}
+
 R.quiz = () => {
   const wrap = el('<div class="block" id="quizWrap"></div>');
   function build(){
     wrap.innerHTML = '';
     let answered = 0, correct = 0;
-    const scoreCard = el('<div class="score-card" role="status" aria-live="polite" tabindex="-1" style="display:none"><div class="big"></div><p class="verdict-line" style="margin-top:6px"></p><div class="cert-actions" style="justify-content:center;margin-top:16px"></div></div>');
+    const scoreCard = el('<div class="score-card" role="status" aria-live="polite" tabindex="-1" style="display:none"><div class="dial-holder"></div><p class="verdict-line" style="margin-top:6px"></p><div class="cert-actions" style="justify-content:center;margin-top:16px"></div></div>');
     QUIZ.forEach((qz,idx)=>{
       /* shuffle option order on every (re)build */
       const order = qz.options.map((_,i)=>i).sort(()=>Math.random()-0.5);
@@ -1026,7 +1145,8 @@ R.quiz = () => {
           if(answered===QUIZ.length){
             state.quizScore = Math.max(state.quizScore||0, correct); save();
             scoreCard.style.display='block';
-            scoreCard.querySelector('.big').textContent = correct+' / '+QUIZ.length;
+            scoreCard.querySelector('.dial-holder').innerHTML='';
+            scoreCard.querySelector('.dial-holder').appendChild(renderDial(correct, QUIZ.length, passMark()));
             const line = scoreCard.querySelector('.verdict-line');
             const actions = scoreCard.querySelector('.cert-actions');
             actions.innerHTML='';
@@ -1170,7 +1290,7 @@ function viewCert(){
       <div class="c-sub">Disability Awareness for the Singapore Workplace &middot; aligned to Enabling Masterplan 2030</div>
       <div class="c-line">This certifies that</div>
       <div class="c-name" id="cName">${esc(state.learnerName||'________________')}</div>
-      <div class="c-line">has completed all five modules of this self-paced course,<br>including two applied case scenarios, and passed the knowledge check.</div>
+      <div class="c-line">has completed all five modules of this self-paced course,<br>including three applied case scenarios, and passed the knowledge check.</div>
       <div class="c-meta"><span>Date<br><strong id="cDate">${dateStr}</strong></span><span>Knowledge check<br><strong>${QUIZ.length} / ${QUIZ.length}</strong></span><span>Duration<br><strong>~90 minutes</strong></span></div>
       <div class="c-foot">Certificate ID: <strong id="cVerify">\u2014</strong> &middot; Issued by InclusionEdge &middot; Disability Awareness@Work</div>
     </div>
@@ -1207,19 +1327,32 @@ function viewCert(){
     const x = cv.getContext('2d');
     if(!x.roundRect){ x.roundRect=function(px,py,w,h,r){ r=Math.min(r,w/2,h/2); this.moveTo(px+r,py); this.arcTo(px+w,py,px+w,py+h,r); this.arcTo(px+w,py+h,px,py+h,r); this.arcTo(px,py+h,px,py,r); this.arcTo(px,py,px+w,py,r); this.closePath(); return this; }; }
     x.fillStyle='#FFFFFF'; x.fillRect(0,0,1600,1132);
-    x.strokeStyle='#1E2A3C'; x.lineWidth=6; x.strokeRect(40,40,1520,1052);
+    /* soft tinted panel */
+    x.fillStyle='#F6F9FD'; x.fillRect(48,48,1504,1036);
+    /* double border */
+    x.strokeStyle='#1E2A3C'; x.lineWidth=5; x.strokeRect(40,40,1520,1052);
+    x.strokeStyle='#C3D4EE'; x.lineWidth=2; x.strokeRect(60,60,1480,1012);
+    /* teal corner brackets */
+    x.strokeStyle='#1787A8'; x.lineWidth=5; const B=70, M=96;
+    [[M,M,1],[1600-M,M,-1],[M,1132-M,1],[1600-M,1132-M,-1]].forEach(function(c){
+      const dir=c[2], vy = (c[1]<566)?1:-1;
+      x.beginPath(); x.moveTo(c[0]+dir*B, c[1]); x.lineTo(c[0], c[1]); x.lineTo(c[0], c[1]+vy*B); x.stroke();
+    });
     const g = x.createLinearGradient(560,0,1040,0);
     [['#6B5CA5',0],['#2F55A4',.28],['#1787A8',.55],['#5CA84D',.78],['#8DC63F',1]].forEach(s=>g.addColorStop(s[1],s[0]));
     x.fillStyle=g; x.beginPath(); x.roundRect(560,110,480,16,8); x.fill();
-    x.textAlign='center'; x.fillStyle='#1A4F9C';
-    x.font='700 30px "Bricolage Grotesque", Arial'; x.fillText('C E R T I F I C A T E   O F   C O M P L E T I O N', 800, 210);
+    x.textAlign='center';
+    x.fillStyle='#1787A8'; x.font='700 26px "Bricolage Grotesque", Arial';
+    x.fillText('C E R T I F I C A T E', 800, 205);
+    x.fillStyle='#4A5A70'; x.font='italic 22px "Atkinson Hyperlegible", Arial';
+    x.fillText('of Completion', 800, 240);
     x.fillStyle='#0F3568'; x.font='800 68px "Bricolage Grotesque", Arial'; x.fillText('Disability Awareness@Work', 800, 310);
     x.fillStyle='#4A5A70'; x.font='28px "Atkinson Hyperlegible", Arial';
     x.fillText('Disability Awareness for the Singapore Workplace \u00B7 aligned to Enabling Masterplan 2030', 800, 366);
     x.fillText('This certifies that', 800, 470);
     x.fillStyle='#1E2A3C'; x.font='800 64px "Bricolage Grotesque", Arial'; x.fillText(state.learnerName||'________________', 800, 556);
     x.fillStyle='#4A5A70'; x.font='28px "Atkinson Hyperlegible", Arial';
-    x.fillText('has completed all five modules of this self-paced course, including two applied', 800, 640);
+    x.fillText('has completed all five modules of this self-paced course, including three applied', 800, 640);
     x.fillText('case scenarios, and passed the knowledge check.', 800, 682);
     x.font='700 30px "Atkinson Hyperlegible", Arial'; x.fillStyle='#0F3568';
     x.fillText('Date: '+dateStr+'      Knowledge check: '+QUIZ.length+' / '+QUIZ.length+'      Duration: ~90 minutes', 800, 800);
@@ -1243,16 +1376,17 @@ function viewCert(){
     const subject = 'Course Completion \u2014 Disability Awareness@Work ['+(org.label||'Unspecified')+']';
     const isoDate = new Date().toISOString().slice(0,10);
     const body = [
-      'Dear HR,','',
-      'I have completed the Disability Awareness@Work eLearning course.','',
+      'Hi HR team,','',
+      'I\u2019m pleased to let you know I\u2019ve completed the Disability Awareness@Work course.','',
+      'Here are my completion details for your records:','',
       'Name: '+state.learnerName,
       'Organisation: '+(org.label||'\u2014'),
       'Date of completion: '+dateStr,
-      'Knowledge check: '+QUIZ.length+' / '+QUIZ.length,
-      'Verification code: '+verifyCode(),'',
+      'Knowledge check: '+state.quizScore+' / '+QUIZ.length,
+      'Certificate ID: '+verifyCode(),'',
       'Record: '+(org.label||'Unspecified')+' | '+state.learnerName+' | '+isoDate+' | '+state.quizScore+'/'+QUIZ.length+' | '+verifyCode(),'',
-      'My certificate (PNG) is attached \u2014 please find the downloaded file \u201cda-at-work-certificate.png\u201d.','',
-      'Regards,',state.learnerName
+      'I\u2019ve downloaded my certificate (da-at-work-certificate.png) and will attach it to this email before sending.','',
+      'Thank you,',state.learnerName
     ].join('\n');
     gcCount('complete-'+(org.label||'unnamed').replace(/\s+/g,'-')+'-report', true);
     const ccParam = CONFIG.reportCC ? '&cc='+encodeURIComponent(CONFIG.reportCC) : '';
@@ -1304,9 +1438,15 @@ function viewAdmin(){
   /* working copy of current config */
   const c = JSON.parse(JSON.stringify(CONFIG));
   c.orgs = c.orgs.map(o=>Object.assign({hash:'',label:'',email:'',logo:''},o));
+  const loadedFrom = (typeof window!=='undefined' && window.DAW_CONFIG) ? 'config.js (external file)' : 'built-in defaults (config.js not found)';
   const v = el(`<div class="admin">
     <h1>Admin configuration</h1>
     <p class="sub">Edit settings, then download a fresh <strong>config.js</strong> and upload it beside index.html. Changes take effect for all learners on their next load. Nothing here is saved automatically.</p>
+    <div class="callout note" style="margin-bottom:18px"><span class="co-label">Currently live on this page</span>
+      <p style="font-size:.86rem">Config source: <strong>${loadedFrom}</strong><br>
+      Pass mark: <strong>${CONFIG.passThreshold}/${QUIZ.length}</strong> &middot; Video skip: <strong>${CONFIG.videoSkip?'on':'off'}</strong> &middot; Access days: <strong>${CONFIG.accessDays}</strong> &middot; Orgs: <strong>${CONFIG.orgs.map(o=>o.label).join(', ')||'none'}</strong></p>
+      <p style="font-size:.8rem;color:var(--ink-soft);margin-top:8px">If this doesn\u2019t match your latest config.js, your browser is showing a cached copy \u2014 hard-refresh with <strong>Ctrl/Cmd + Shift + R</strong>.</p>
+    </div>
 
     <fieldset><legend>Video</legend>
       <div class="row2"><div><label>Video file</label><input type="text" data-k="videoSrc" value="${c.videoSrc}"></div><div><label>Captions file (.vtt)</label><input type="text" data-k="videoCaptions" value="${c.videoCaptions}"></div></div>
