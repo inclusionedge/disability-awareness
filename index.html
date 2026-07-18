@@ -197,6 +197,10 @@ main{max-width:var(--maxw);margin:0 auto;padding:34px 20px 90px}
 .mcq h4{font-size:1.05rem;margin-bottom:14px;color:var(--deep)}
 .mcq .opts{display:flex;flex-direction:column;gap:9px}
 .mcq .opt{border:1.5px solid var(--line);border-radius:11px;padding:12px 15px;background:var(--mist);text-align:left;font-size:.95rem;transition:border-color .12s}
+.mcq .cbx-row{display:flex;align-items:center;gap:12px;cursor:pointer}
+.mcq .cbx-row input{width:19px;height:19px;flex:0 0 19px;accent-color:var(--teal)}
+.mcq .cbx-row.correct{background:var(--lime-soft);border-color:var(--lime);font-weight:700}
+.mcq .cbx-row.wrong{background:var(--coral-soft);border-color:var(--coral)}
 .mcq .opt:hover{border-color:var(--teal)}
 .mcq .opt.correct{background:var(--lime-soft);border-color:var(--lime);font-weight:700}
 .mcq .opt.wrong{background:var(--coral-soft);border-color:var(--coral)}
@@ -429,6 +433,17 @@ footer.site .band{height:6px;border-radius:99px;background:var(--spectrum);margi
   }catch(e){ /* file:// or missing config.js — defaults apply */ }
 })();
 </script>
+<!-- Course content: quiz.js sets window.DAW_QUIZ; each file below pushes one
+     module onto window.DAW_CONTENT, in the order the course should present
+     them. To add, remove or reorder a module, add/remove/reorder a line
+     here — nothing else needs to change. The last content file listed is
+     always treated as the closing module (knowledge check + certificate). -->
+<script src="quiz.js"></script>
+<script src="content/module-1-why-this-matters.js"></script>
+<script src="content/module-2-understanding-disability.js"></script>
+<script src="content/module-3-working-alongside.js"></script>
+<script src="content/module-4-examining-assumptions.js"></script>
+<script src="content/module-5-recap-knowledge-check.js"></script>
 <script>
 /* =========================================================
    Working Alongside — self-contained course engine.
@@ -539,7 +554,6 @@ if(!store){
   });
 }
 
-const TYPE_COLORS = { m0:'#6B5CA5', m1:'#3D5AA9', m2:'#1A4F9C', m3:'#1787A8', m4:'#4C9E5F', m5:'#6FA82F' };
 
 /* ---------- tiny inline SVG icon set (original, geometric) ---------- */
 const ICONS = {
@@ -562,7 +576,7 @@ const el = (html) => { const t=document.createElement('template'); t.innerHTML=h
 function esc(s){return s.replace(/&/g,'&amp;').replace(/</g,'&lt;');}
 function updateRibbon(){
   const done = Object.keys(state.completed).length;
-  document.getElementById('ribbonFill').style.width = (done/5*100)+'%';
+  document.getElementById('ribbonFill').style.width = (done/(MODULES.length||1)*100)+'%';
 }
 
 /* ---------- block renderers ---------- */
@@ -611,10 +625,11 @@ const R = {
   },
 
   carousel: b => {
-    const wrap = el(`<div class="block"><div class="carousel">
-      <div class="carousel-stage" role="group" aria-live="polite"></div>
-      <div class="carousel-nav"><button class="c-prev" aria-label="Previous">&#8249;</button><div class="carousel-dots"></div><button class="c-next" aria-label="Next">&#8250;</button></div>
+    const wrap = el(`<div class="block"><div class="carousel" tabindex="0" role="group" aria-roledescription="carousel" aria-label="${esc(b.label||'Slides')} — use the arrow buttons or your left/right arrow keys">
+      <div class="carousel-stage" aria-live="polite"></div>
+      <div class="carousel-nav"><button class="c-prev" aria-label="Previous slide">&#8249;</button><div class="carousel-dots" aria-hidden="true"></div><button class="c-next" aria-label="Next slide">&#8250;</button></div>
     </div></div>`);
+    const carEl = wrap.querySelector('.carousel');
     const stage = wrap.querySelector('.carousel-stage'), dots = wrap.querySelector('.carousel-dots');
     const prev = wrap.querySelector('.c-prev'), next = wrap.querySelector('.c-next');
     let i = 0;
@@ -622,12 +637,20 @@ const R = {
     function show(n){
       i = Math.max(0, Math.min(b.slides.length-1, n));
       const sl = b.slides[i];
-      stage.innerHTML = (sl.tag?`<span class="carousel-tag">${sl.tag}</span>`:'') + (sl.h?`<h4>${sl.h}</h4>`:'') + sl.html;
+      stage.innerHTML = (sl.tag?`<span class="carousel-tag">${sl.tag}</span>`:'') + (sl.h?`<h4>${sl.h}</h4>`:'') + sl.html
+        + `<span class="sr-only">Slide ${i+1} of ${b.slides.length}</span>`;
       [...dots.children].forEach((d,j)=>d.classList.toggle('on', j===i));
       prev.disabled = i===0; next.disabled = i===b.slides.length-1;
     }
     prev.addEventListener('click',()=>show(i-1));
     next.addEventListener('click',()=>show(i+1));
+    /* keyboard: left/right arrows move slides when the carousel has focus —
+       no swipe-only, no autoplay, so this never relies on a gesture a
+       keyboard or switch-device user can't perform */
+    carEl.addEventListener('keydown',e=>{
+      if(e.key==='ArrowLeft'){ e.preventDefault(); show(i-1); }
+      else if(e.key==='ArrowRight'){ e.preventDefault(); show(i+1); }
+    });
     show(0);
     return wrap;
   },
@@ -636,11 +659,21 @@ const R = {
     const wrap = el(`<div class="block"><div class="flipgrid"></div></div>`);
     const grid = wrap.querySelector('.flipgrid');
     b.pairs.forEach(p=>{
-      const f = el(`<div class="flip"><button aria-label="Flip card: ${esc(p.avoid)}">
+      const f = el(`<div class="flip"><button aria-pressed="false">
         <span class="face front"><span class="tagline">Instead of&hellip;</span><span class="term">&ldquo;${p.avoid}&rdquo;</span><span class="hint">Tap to flip</span></span>
-        <span class="face back"><span class="tagline">Try</span><span class="term">&ldquo;${p.use}&rdquo;</span><span class="hint">Tap to flip back</span></span>
+        <span class="face back" aria-hidden="true"><span class="tagline">Try</span><span class="term">&ldquo;${p.use}&rdquo;</span><span class="hint">Tap to flip back</span></span>
       </button></div>`);
-      f.querySelector('button').addEventListener('click',()=>f.classList.toggle('flipped'));
+      const btn = f.querySelector('button'), front = f.querySelector('.front'), back = f.querySelector('.back');
+      btn.setAttribute('aria-label', `Language card. Currently showing: avoid saying "${p.avoid}". Activate to reveal the preferred term.`);
+      btn.addEventListener('click',()=>{
+        const flipped = f.classList.toggle('flipped');
+        btn.setAttribute('aria-pressed', String(flipped));
+        front.setAttribute('aria-hidden', String(flipped));
+        back.setAttribute('aria-hidden', String(!flipped));
+        btn.setAttribute('aria-label', flipped
+          ? `Language card. Currently showing: the preferred term, "${p.use}". Activate to flip back.`
+          : `Language card. Currently showing: avoid saying "${p.avoid}". Activate to reveal the preferred term.`);
+      });
       grid.appendChild(f);
     });
     return wrap;
@@ -751,354 +784,99 @@ const R = {
     return box;
   },
 
+  image: b => {
+    const fig = el(`<figure class="block img-block">
+      <img src="${b.src}" alt="${esc(b.alt||'')}" loading="lazy" style="width:100%;border-radius:var(--radius);box-shadow:var(--shadow);display:block">
+      <div class="callout warm img-fallback" style="display:none;margin-top:10px"><span class="co-label">Image not found</span><p>Expected file: <code>${esc(b.src)}</code>. If you\u2019re the course owner, check the file is uploaded to the same folder as this page, with exactly this name.</p></div>
+      ${b.caption?`<figcaption style="font-size:.85rem;color:var(--ink-soft);margin-top:8px">${b.caption}</figcaption>`:''}
+    </figure>`);
+    fig.querySelector('img').addEventListener('error', function(){ this.style.display='none'; fig.querySelector('.img-fallback').style.display='block'; });
+    return fig;
+  },
+
+  video: b => {
+    const fig = el(`<figure class="block video-block">
+      <div class="video-shell"><video controls preload="metadata" playsinline style="width:100%;border-radius:12px;display:block;background:#000">
+        <source src="${b.src}" type="video/mp4">
+        ${b.captions?`<track kind="captions" src="${b.captions}" srclang="en" label="English">`:''}
+      </video>
+      <div class="callout warm video-fallback" style="display:none;margin-top:12px"><span class="co-label">Video not found</span><p>Expected file: <code>${esc(b.src)}</code>. If you\u2019re the course owner, check the file is uploaded to the same folder as this page, with exactly this name.</p></div></div>
+      ${b.caption?`<figcaption style="font-size:.85rem;color:var(--ink-soft);margin-top:8px">${b.caption}</figcaption>`:''}
+    </figure>`);
+    const vid = fig.querySelector('video');
+    vid.addEventListener('error', ()=>{ vid.style.display='none'; fig.querySelector('.video-fallback').style.display='block'; });
+    return fig;
+  },
+
+  /* select-all-that-apply quick check — same {q, options, why} shape as
+     mcq, but `answer` is an array of every correct option's index, and
+     answering needs a deliberate submit (checking several boxes first)
+     rather than mcq's instant reveal-on-click. Shares the onAnswer(bool)
+     callback interface with mcq so it can also be used as a QUIZ item. */
+  checkbox: b => {
+    const box = el(`<div class="mcq"><div class="q-label">${ICONS.bulb} Quick check &middot; select all that apply</div><h4>${b.q}</h4><div class="opts cbx"></div><button class="btn small" style="margin-top:6px">Check my answer</button><div class="fb" role="status" aria-live="polite" tabindex="-1"></div></div>`);
+    const opts = box.querySelector('.opts'), submit = box.querySelector('button'), fb = box.querySelector('.fb');
+    const correctSet = new Set(b.answer);
+    const inputs = [];
+    b.options.forEach((o,i)=>{
+      const cid = 'cbx_'+Math.random().toString(36).slice(2,9);
+      const row = el(`<label class="opt cbx-row" for="${cid}"><input type="checkbox" id="${cid}"><span>${o}</span></label>`);
+      inputs.push(row.querySelector('input'));
+      opts.appendChild(row);
+    });
+    submit.addEventListener('click',()=>{
+      inputs.forEach(i=>i.disabled=true); submit.disabled=true;
+      let allCorrect = true;
+      inputs.forEach((inp,i)=>{
+        const shouldCheck = correctSet.has(i), row = inp.closest('.opt');
+        if(shouldCheck){ row.classList.add('correct'); if(!inp.checked) allCorrect=false; }
+        else if(inp.checked){ row.classList.add('wrong'); allCorrect=false; }
+      });
+      fb.className='fb show '+(allCorrect?'good':'bad');
+      fb.innerHTML = (allCorrect?'<strong>Correct.</strong> ':'<strong>Not quite \u2014 correct options are highlighted above.</strong> ') + b.why;
+      fb.focus({preventScroll:false});
+      if(b.onAnswer) b.onAnswer(allCorrect);
+    });
+    return box;
+  },
+
   html: b => { const w=el(`<div class="block"></div>`); w.appendChild(b.node()); return w; }
 };
 
 /* =========================================================
    COURSE CONTENT
+   MODULES and QUIZ are no longer written in this file. quiz.js
+   sets window.DAW_QUIZ, and each file in content/ pushes one
+   module onto window.DAW_CONTENT — see the <script> tags near
+   the top of <body>. This means editing a module's wording, or
+   editing the quiz, never means opening this file.
 ========================================================= */
-const MODULES = [
-{
-  id:'m0', num:'1', time:'~10 min', title:'Why this matters',
-  menuSub:'Singapore\u2019s 2030 employment goal, the gap that remains, and why the last mile is yours',
-  lede:'Someone with a disability has joined \u2014 or may soon join \u2014 your team. This module sets out what Singapore is working towards, and why the part that matters most cannot be delivered by any scheme, agency or policy. It stays with you.',
-  blocks:[
-    {type:'quote', text:'A caring and inclusive society where persons with disabilities are enabled to pursue their aspirations, achieve their potential, and participate as integral members of society.', cite:'The vision of the Enabling Masterplan 2030 \u2014 Singapore\u2019s national roadmap for disability and inclusion'},
-    {type:'text', html:'<p>That vision is not built in policy documents. It is built in ordinary places \u2014 a lunch table, a stand-up meeting, a handover conversation. The workplace is one of the most important, because a job is income, independence, identity and community all at once.</p><p>And it is where Singapore still has the furthest to travel.</p>'},
-    {type:'h2', text:'The gap'},
-    {type:'stats', items:[
-      {n:'34.7%', l:'employment rate of residents with disabilities aged 15\u201364 (2024\u201325 average)'},
-      {n:'40%', l:'the target Singapore has set for 2030 under EMP2030'},
-      {n:'~2 in 3', l:'employment rate for residents without disabilities \u2014 the gap that remains'}
-    ]},
-    {type:'text', html:'<p>The figure has climbed steadily \u2014 from 28.2% in 2018/2019 \u2014 but the distance to both the target and the wider workforce is still substantial. Every percentage point represents real people who can work, want to work, and are not working.</p><p>Getting people <em>hired</em> is only half the problem. Whether a colleague stays, grows and belongs is decided by the people alongside, every single day. That is you.</p>'},
-    {type:'h2', text:'Where the barrier actually sits'},
-    {type:'callout', kind:'key', label:'The idea underneath this whole course', html:'<p>It is tempting to think a person is limited by a condition. Far more often, the limit is an <strong>environment designed without that person in mind</strong> \u2014 a meeting where three people talk at once, a document a screen reader cannot open, a briefing full of idioms, a step where a ramp could have been.</p><p>EMP2030 names both the <strong>physical and the mindset barriers</strong> that keep people from participating fully. The good news is blunt: barriers were built by people, so people can take barriers down. Many of the ones that matter most sit inside your control \u2014 no budget, no approval needed.</p>'},
-    {type:'h2', text:'This is about all of us'},
-    {type:'text', html:'<p>Disability is not a fixed category of other people. Most disability is <strong>acquired</strong> \u2014 a stroke, a road accident, an injury at work, hearing or vision that fades over the years. A colleague with no disability today may well acquire one before retirement. So might you.</p><p>Singapore\u2019s ageing population makes this concrete: by 2030, <strong>one in four Singaporeans will be 65 or older</strong>, and the number of people living with some form of disability will rise with it. The workplace you help build now is the one you may need later.</p>'},
-    {type:'callout', kind:'dyk', label:'Did you know?', html:'<p>Because most disability is acquired rather than present from birth, disability inclusion is one of the few workplace issues that will, statistically, affect nearly everyone \u2014 given a long enough career.</p>'},
-    {type:'h2', text:'Where this course sits in the national plan'},
-    {type:'text', html:'<p>EMP2030 sets out 29 recommendations across three strategic themes, spanning 14 focal areas. One focal area is where you come in.</p>'},
-    {type:'callout', kind:'key', label:'Theme 2 \u00b7 Focal Area 4 \u2014 Inclusive Employment', html:'<p style="font-size:1.06rem;line-height:1.6">\u201cBy 2030, we aspire for persons with disabilities who can work to be <strong>equally recognised for their abilities, knowledge, and skills</strong>, and are able to achieve gainful employment.\u201d</p><p style="margin-top:10px;font-size:.9rem;color:var(--ink-soft)">The goal of Focal Area 4, Enabling Masterplan 2030</p>'},
-    {type:'text', html:'<p>Read that goal again, and notice where the weight falls. Not <em>employed</em>. <strong>Equally recognised.</strong></p><p>Those are two different things, and the second is much harder than the first. A person can be hired and still not be recognised \u2014 handed the safe tasks, left out of the stretch project, talked over in meetings, discussed rather than consulted. Getting through the door is not the same as being seen.</p>'},
-    {type:'h2', text:'And here is the part that stays with you'},
-    {type:'text', html:'<p>Singapore can fund a workplace adjustment. It can accredit inclusive employers, train job coaches, and set a national target. It has done all of these.</p><p>What it cannot do is <strong>recognise your colleague for you</strong>.</p><p>Recognition is not a scheme. It happens \u2014 or fails to happen \u2014 in ordinary moments that no policy can reach. Who gets asked for a view at the huddle. Who is trusted with the customer. Whose silence is read as having nothing to say. Who gets invited along at lunchtime. Whose name comes up when an opportunity is going spare.</p>'},
-    {type:'quote', text:'Every one of those moments belongs to a colleague. Which means the last mile of Singapore\u2019s national plan runs straight through your team \u2014 and it stays with you.', cite:'The premise of this course'},
-    {type:'callout', kind:'note', label:'Who else is in this with you', html:'<p><strong>MSF</strong> leads the Enabling Masterplans \u2014 the national roadmap. <strong>SG Enable</strong>, set up by MSF in 2013, is Singapore\u2019s focal agency and first stop for disability and inclusion, and works with employers to make it real. <strong>Your HR team</strong> is your route to all of it \u2014 more on that in Module 5.</p><p>But none of these sits next to your colleague every day. You do.</p>'},
-    {type:'h2', text:'What you\u2019ll be able to do'},
-    {type:'text', html:'<ul class="plain"><li><strong>Describe</strong> the main disability types in Singapore and how each can shape a colleague\u2019s working day. <em>(Module 2)</em></li><li><strong>Apply</strong> respectful, practical etiquette across the five moments that decide recognition \u2014 day one, briefing, meetings, feedback and belonging. <em>(Module 3)</em></li><li><strong>Recognise</strong> the well-meant assumptions that quietly withhold recognition \u2014 in task allocation, performance reads, development and airtime. <em>(Module 4)</em></li></ul>'},
-    {type:'callout', kind:'warm', label:'Honest framing', html:'<p>This course will <strong>not</strong> make you an expert on disability \u2014 nobody becomes one in 90 minutes. It aims for something more useful: that you feel <strong>familiar and a little more ready</strong>, know the safe first moves, and know who to turn to when you\u2019re unsure.</p><p>You are not expected to have all the answers. You are expected to not look away.</p>'},
-    {type:'confidence', slot:'confidenceStart', q:'Right now, how confident do you feel interacting with and supporting a colleague with a disability?'},
-    {type:'callout', kind:'note', label:'How this course works', html:'<p>Five bite-sized modules, about 90 minutes in total. Take the modules in order, or jump to what you need. Your progress, reflections and name stay on this device \u2014 nothing personal is sent anywhere \u2014 and your reflections can be downloaded at the end.</p>'}
-  ]
-},
-{
-  id:'m1', num:'2', time:'~18 min', title:'Understanding disability in Singapore',
-  menuSub:'The four types, what each means in a working day, and what you cannot see',
-  lede:'Before etiquette comes understanding. Here are the four broad disability types recognised in Singapore, what each can look like across a working day \u2014 and the strengths that come with each.',
-  blocks:[
-    {type:'text', html:'<p>In Singapore, disability is broadly grouped into four types: <strong>physical disability</strong>, <strong>sensory impairment</strong> (hearing and vision), <strong>intellectual disability</strong> and <strong>autism</strong>. These groupings help plan services and support. They are a starting point for understanding a person \u2014 never a description of one.</p>'},
-    {type:'text', html:'<p>Among persons with disabilities in Singapore, <strong>physical disability is the largest group</strong>, followed by intellectual disability and hearing loss. But a headline figure matters far less than the person in front of you \u2014 so we will spend our time on understanding, not statistics.</p>'},
-    {type:'callout', kind:'note', label:'A note on scope', html:'<p>This course covers these four disability types. <strong>Mental health conditions</strong> are a related but distinct area, with separate support and guidance. Much of the respect and communication practice you learn here carries across \u2014 but it is a different topic.</p>'},
-    {type:'h2', text:'What you cannot see'},
-    {type:'text', html:'<p>Many disabilities are <strong>invisible</strong>. You cannot tell by looking whether a colleague has hearing loss, low vision, or is autistic. Someone may use no cane, no wheelchair, no hearing aid \u2014 and still be navigating a working day you know nothing about.</p><p>And your colleague is <strong>under no obligation to tell you</strong>. Disclosure is a personal decision, often shaped by a real fear of being treated differently. You are not owed an explanation. What you are responsible for is the response when a need does surface \u2014 and the climate that makes it safe to raise one.</p>'},
-    {type:'callout', kind:'dyk', label:'Did you know?', html:'<p>Many disabilities are invisible \u2014 hearing loss, low vision, autism, chronic conditions. The colleague sitting beside you may be navigating a working day you know nothing about, and doing it well.</p>'},
-    {type:'h2', text:'The four types \u2014 and the working day'},
-    {type:'text', html:'<p>Open each one. For each: what it is, what it can mean at work, and what it often brings to a team.</p>'},
-    {type:'accordion', items:[
-      {icon:'ear', bg:'#E8EFF9', fg:'#1A4F9C', title:'Deafness / hearing loss', sub:'Sensory \u00b7 frequently invisible',
-       html:'<p>Ranges from partial hearing loss to profound deafness. Some colleagues use hearing aids, some lip-read, some use sign language, some use a combination \u2014 and some do none of these visibly at all.</p><h5>In a working day</h5><ul><li>Group meetings and conference calls are usually the hardest part of the day \u2014 not because your colleague cannot follow the content, but because the information is not arriving.</li><li>Overlapping voices, a face turned to a screen, background noise in an open office \u2014 any one of these can break communication entirely.</li><li>Phone-heavy tasks may need rethinking. Written channels often work perfectly.</li></ul><h5>What often comes with it</h5><p>Strong visual attention, careful reading of body language and context, and \u2014 for teams willing to adjust \u2014 meetings that become clearer for everyone.</p>'},
-      {icon:'eye', bg:'#EFF6DE', fg:'#4C6B1E', title:'Visual impairment', sub:'Sensory \u00b7 a spectrum, not one condition',
-       html:'<p>Ranges from <strong>low vision</strong> to <strong>tunnel vision</strong> (peripheral vision lost, central vision retained) to <strong>blindness</strong>. Many people with low vision use no cane and no guide dog \u2014 you would never know.</p><h5>In a working day</h5><ul><li>Information arrives through what can be heard, read by a screen reader, or touched \u2014 not through what is glanced at.</li><li>Printed handouts, unlabelled charts and \u201cas you can see on the screen\u2026\u201d presentations exclude by default. Accessible documents and spoken description include.</li><li>Finding a seat in an unfamiliar room requires information that sighted colleagues absorb without ever noticing it.</li></ul><h5>What often comes with it</h5><p>High-level listening, strong memory and organisation, and fluency with assistive technology that most colleagues never master.</p>'},
-      {icon:'move', bg:'#FBF0DC', fg:'#A66B12', title:'Physical disability', sub:'Congenital or acquired \u00b7 the largest group',
-       html:'<p>Partial or total loss of bodily function or body parts. Some colleagues are born with a condition such as cerebral palsy or muscular dystrophy. Many acquire one later \u2014 an accident, an infection, a stroke.</p><h5>In a working day</h5><ul><li>The barriers are usually environmental: steps without ramps, heavy doors, high shelves, a narrow pantry, a commute at peak hour.</li><li>What colleagues rarely see is <strong>fatigue</strong>. Ordinary tasks can cost significantly more energy and time.</li><li>The work itself is often entirely unaffected. The building and the journey are the problem \u2014 not the person.</li></ul><h5>What often comes with it</h5><p>Considerable problem-solving practice. People who navigate an inaccessible city daily tend to be resourceful, persistent planners.</p>'},
-      {icon:'mind', bg:'#F9E9E4', fg:'#C4553B', title:'Intellectual disability & autism', sub:'Distinct conditions \u00b7 some people have both',
-       html:'<p><strong>Intellectual disability</strong> affects how a person processes information, solves problems and manages everyday tasks. What matters at work is not a clinical label but the <strong>level of support</strong> a person needs: more structure, more time, a different way in. It says nothing about reliability, commitment, or worth to a team.</p><p><strong>Autism</strong> is a lifelong developmental condition affecting communication, social interaction, and how a person experiences the surrounding world.</p><h5>The spectrum is not a line</h5><p>People hear \u201cspectrum\u201d and picture a line running from mild to severe. It is closer to a <strong>spiderweb</strong>: communication, sensory processing, social interaction, need for routine \u2014 each person sits differently on each strand. One colleague may be untroubled by noise but overwhelmed by bright light; another, precisely the reverse. Meet the person, not the label.</p><h5>In a working day</h5><ul><li>Clear, concrete, literal instructions land. Sarcasm, idioms and vague briefs (\u201cjust make it pop\u201d) don\u2019t.</li><li>Sudden changes to routine, or sensory overload from noise, lights or crowded events, can be genuinely difficult. Predictability helps.</li><li>A quiet colleague, or one who doesn\u2019t make eye contact, is not a disengaged one.</li></ul><h5>What often comes with it</h5><p>Focus, precision, pattern recognition, honesty and exceptional consistency with structured work. Employers who get the conditions right frequently report these colleagues outperforming expectations \u2014 you\u2019ll see the evidence in Module 4.</p>'}
-    ]},
-    {type:'callout', kind:'key', label:'The one-line takeaway', html:'<p>Disability exists on a spectrum, and every person on it is different. The type tells you <strong>where to start asking</strong>. It never tells you what to assume.</p>'},
-    {type:'mcq', q:'Your new colleague Farhan mentions he has low vision. Which assumption is safest?', options:['He can\u2019t use a computer, so screen-based work is out','He must use a cane, so his needs will be obvious','You can\u2019t know his specific needs yet \u2014 the type only tells you what to ask about','Low vision means he sees everything, just blurry'], answer:2, why:'Visual impairment is a spectrum \u2014 low vision, tunnel vision, blindness \u2014 and many people use no visible aid at all. Farhan is the expert on what works for him. The category simply gives you a starting point for the conversation.'},
-    {type:'mcq', q:'Why do group meetings and huddles often become the hardest part of the day for a colleague with hearing loss?', options:['The topics are usually too complex to follow','The information is not arriving \u2014 overlapping voices, faces turned away, background noise','A preference not to participate','Hearing aids do not work indoors'], answer:1, why:'It is an access problem, not a comprehension problem \u2014 the barrier is in the environment, not the person. Fix how the meeting runs (one voice at a time, faces visible, notes shared) and participation follows. Module 3 shows you exactly how.'},
-    {type:'reflect', key:'r_m1', q:'Think about your own workplace. Which of these four types have you knowingly worked alongside? Which would you feel least confident supporting today \u2014 and what specifically makes you uncertain?'}
-  ]
-},
-{
-  id:'m2', num:'3', time:'~28 min', title:'Working alongside: everyday practice',
-  menuSub:'Five ordinary moments \u2014 and what to do in each',
-  lede:'Recognition is not announced. It is delivered in ordinary moments that repeat every shift and every week. This module walks through five of moments, whatever your job, wherever you work.',
-  blocks:[
-    {type:'callout', kind:'key', label:'The one pattern to carry', html:'<p><strong>Ask \u2192 Listen \u2192 Adjust.</strong> There is no rulebook to memorise. When unsure, ask your colleague \u2014 privately, respectfully, about the work. Listen to the actual answer rather than the one you expected. Adjust, and keep checking as you both learn what works.</p><p>You have an advantage a stranger on the street never gets: <strong>you will see this colleague again tomorrow.</strong> You can get it slightly wrong and put it right. That is what makes a workplace the easiest place in society to get inclusion right \u2014 and the least excusable place to get it wrong.</p>'},
-    {type:'callout', kind:'note', label:'This applies wherever you work', html:'<p>An open-plan office. A retail floor. A hotel kitchen. A hospital ward. A warehouse aisle. A security post. The setting changes; the five moments do not.</p>'},
+const MODULES = window.DAW_CONTENT || [];
+const QUIZ = window.DAW_QUIZ || [];
 
-    {type:'h2', text:'The five moments'},
-    {type:'accordion', items:[
-      {icon:'people', bg:'#E8EFF9', fg:'#1A4F9C', title:'1 \u00b7 Meeting a new colleague', sub:'The first shift sets the tone for every shift after',
-       html:'<ul><li>Introduce yourself the way you would to anyone. No lowered voice, no over-bright smile, no slowing down unless asked.</li><li>Say the name, use the name, and use it often. It is the simplest signal that a colleague belongs here.</li><li>Pass on the unwritten rules \u2014 where people take breaks, which chat group actually matters, who to ask about the roster, which machine jams. This knowledge travels between colleagues, never through a policy.</li><li>Do not open with questions about the disability. A first conversation is about the work, the team, and the terrible coffee \u2014 exactly as with anyone else.</li></ul>'},
-      {icon:'chat', bg:'#EFF6DE', fg:'#4C6B1E', title:'2 \u00b7 Communicating clearly', sub:'Where most breakdowns actually begin',
-       html:'<ul><li>Be concrete. \u201cRestock aisle 4 before the lunch rush\u201d beats \u201chelp out in front when you can.\u201d</li><li>Say it, then leave it somewhere it can be checked again \u2014 a note, a message, a photo of the layout. Nobody should have to rely on catching something once.</li><li>Drop the idioms and the sarcasm. \u201cMake it pop\u201d and \u201cyou know the drill\u201d are not instructions to anyone.</li><li>If a colleague keeps asking for the same clarification, the instruction is the problem \u2014 not the colleague.</li></ul>'},
-      {icon:'move', bg:'#FBF0DC', fg:'#A66B12', title:'3 \u00b7 Working side by side', sub:'Shifts, handovers, tasks, the counter, the ward',
-       html:'<ul><li>Hand over context, not just tasks. Assume nothing was overheard across a noisy floor.</li><li>Notice what the environment is doing. A stockroom shelf out of reach, a briefing given at a noisy handover, a sign nobody can read from a seated height \u2014 these are barriers you can point out, and often fix.</li><li>Do not quietly take over the harder parts of a task. Ask first. What looks like helping can land as a verdict.</li><li>In a group huddle or a shift briefing: one voice at a time, faces up, and share what was said with anyone who missed it.</li></ul>'},
-      {icon:'shield', bg:'#F9E9E4', fg:'#C4553B', title:'4 \u00b7 Offering help', sub:'The moment most people get wrong \u2014 kindly',
-       html:'<ul><li><strong>Offer. Wait. Then ask how.</strong> Never grab, steer, push, or take over. Help given without consent is not help.</li><li>\u201cNo thanks\u201d is a complete answer. Accept it without persuading, and without being wounded.</li><li>Ask <em>\u201cwould it help if I\u2026\u201d</em>, not <em>\u201clet me do that for you.\u201d</em> One offers. The other decides.</li><li>And if you get it wrong \u2014 apologise briefly, correct it, move on. Do not make a colleague manage your embarrassment.</li></ul>'},
-      {icon:'star', bg:'#EDE9F7', fg:'#6B5CA5', title:'5 \u00b7 Including', sub:'The moment nobody schedules, and everybody notices',
-       html:'<ul><li>Invite. Every time. The break, the meal, the birthday collection, the group photo, the WhatsApp group. A colleague can always decline \u2014 the exclusion is in never being asked.</li><li>Check where the team is going. A dinner up a flight of stairs, or a karaoke room for a deaf colleague, excludes before anyone arrives.</li><li>Talk about football, food, the weekend, the price of chicken rice. A colleague is a colleague, not a topic.</li><li>Watch for presence without participation. Being in the room is not the same as being in the conversation.</li></ul>'}
-    ]},
+/* ---- bootstrap: derive each module's display number, colour, and
+   stable fallback id purely from load order. A course can have any
+   number of modules — add or remove a file in content/, and the
+   menu, progress ribbon, "Module X of N" tags and certificate text
+   all adjust on their own. The LAST module to load is always the
+   closing module: the one that carries the knowledge check and the
+   certificate gate (see FINAL_MODULE below). ---- */
+const MODULE_PALETTE = ['#6B5CA5','#3D5AA9','#1A4F9C','#1787A8','#4C9E5F','#6FA82F','#A66B12','#C4553B'];
+MODULES.forEach((m,i)=>{
+  m.num = String(i+1);
+  m.color = MODULE_PALETTE[i % MODULE_PALETTE.length];
+  m.id = m.id || ('module-'+(i+1));
+});
+const FINAL_MODULE = MODULES[MODULES.length-1] || null;
 
-    {type:'h2', text:'The practical moves, by disability type'},
-    {type:'text', html:'<p>The five moments are the frame. Here is what fits inside.</p>'},
-
-    {type:'h2', text:'A colleague who is deaf or hard of hearing'},
-    {type:'tiles', items:[
-      {icon:'people', bg:'#E8EFF9', fg:'#1A4F9C', h:'Get attention first', p:'A light tap or a small wave before speaking \u2014 so a colleague is not catching up mid-sentence.'},
-      {icon:'chat', bg:'#E8EFF9', fg:'#1A4F9C', h:'Face on, mouth visible', p:'Do not cover your mouth, chew, or talk while walking away. Masks and turned faces stop the message dead.'},
-      {icon:'bulb', bg:'#E8EFF9', fg:'#1A4F9C', h:'Rephrase, don\u2019t repeat', p:'If it did not land, use different words. Shouting rarely helps and distorts speech.'},
-      {icon:'check', bg:'#E8EFF9', fg:'#1A4F9C', h:'Fix the huddle, not the person', p:'One voice at a time. Notes or a photo of the whiteboard afterwards. Captions on video calls. The barrier is the briefing, not the hearing.'}
-    ]},
-
-    {type:'h2', text:'A colleague with visual impairment'},
-    {type:'tiles', items:[
-      {icon:'chat', bg:'#EFF6DE', fg:'#4C6B1E', h:'Say who you are', p:'\u201cHi Farhan, it\u2019s Mei Lin.\u201d And say when you are leaving \u2014 nobody enjoys talking to an empty space.'},
-      {icon:'people', bg:'#EFF6DE', fg:'#4C6B1E', h:'Offer an arm \u2014 never grab', p:'Let your colleague take your arm or elbow, and walk at a normal pace. Never steer, pull, or push.'},
-      {icon:'bulb', bg:'#EFF6DE', fg:'#4C6B1E', h:'Be specific out loud', p:'Not \u201cover there\u201d \u2014 \u201cthe trolley is five steps to your left.\u201d Read out what is on the screen or the noticeboard rather than pointing.'},
-      {icon:'shield', bg:'#EFF6DE', fg:'#4C6B1E', h:'A guide dog is working', p:'Do not pet, call or feed it. A distracted guide dog is a safety risk, not a cute moment.'}
-    ]},
-
-    {type:'h2', text:'A colleague with physical disability'},
-    {type:'tiles', items:[
-      {icon:'shield', bg:'#FBF0DC', fg:'#A66B12', h:'A wheelchair is personal space', p:'Do not touch, lean on, or push a wheelchair uninvited. It is part of a person\u2019s body, not equipment.'},
-      {icon:'people', bg:'#FBF0DC', fg:'#A66B12', h:'Offer, then wait', p:'Wait for the offer to be accepted before acting \u2014 then ask how to help. Assume competence first.'},
-      {icon:'chat', bg:'#FBF0DC', fg:'#A66B12', h:'Eye level for real conversations', p:'Pull up a chair for anything longer than a passing word. Nobody enjoys being loomed over.'},
-      {icon:'check', bg:'#FBF0DC', fg:'#A66B12', h:'Watch the environment', p:'A blocked ramp, a stacked box in the aisle, a lift out of service. Flag it, shift it, and relax \u2014 \u201clet\u2019s go for a walk\u201d is a perfectly normal thing to say.'}
-    ]},
-
-    {type:'h2', text:'A colleague with intellectual disability or autism'},
-    {type:'tiles', items:[
-      {icon:'chat', bg:'#F9E9E4', fg:'#C4553B', h:'Speak to the person', p:'Directly \u2014 not to a job coach, a buddy, or a family member standing nearby. Decide things with a colleague, never about a colleague.'},
-      {icon:'bulb', bg:'#F9E9E4', fg:'#C4553B', h:'Concrete beats clever', p:'Short sentences, literal words, one instruction at a time. Skip the hints and the hinting.'},
-      {icon:'check', bg:'#F9E9E4', fg:'#C4553B', h:'Show, and write it down', p:'Demonstrate the first step. Leave something to check back against \u2014 a card, a photo, a checklist by the machine.'},
-      {icon:'people', bg:'#F9E9E4', fg:'#C4553B', h:'Give processing time', p:'Do not rush to fill a silence. A delayed or unexpected response is not rudeness, and it is not about you.'}
-    ]},
-
-    {type:'h2', text:'Case one: the shift briefing'},
-    {type:'scenario',
-      title:'Danish joins the crew',
-      setting:'You work front of house at a busy hotel restaurant. Danish, who is deaf, joined the crew last week \u2014 he lip-reads well one-to-one and messages confidently on the team chat. Every day begins with a five-minute pre-service huddle: eight crew, fast, noisy, everyone talking at once. You are a fellow crew member, not the supervisor.',
-      start:'s1',
-      nodes:{
-        s1:{text:['At today\u2019s huddle you notice Danish is standing at the back, and two colleagues are talking over each other while facing the service counter. Danish has stopped following. What do you do?'], choices:[
-          {label:'Nothing \u2014 it is not your huddle to run, and speaking up would be awkward', to:'s1a'},
-          {label:'Stand next to Danish and whisper a summary of what is being said', to:'s1b'},
-          {label:'Say out loud: \u201cSorry \u2014 one at a time, and can we face the group? Hard to follow otherwise.\u201d', to:'s1c'}
-        ]},
-        s1a:{tag:'poor', text:['The huddle ends. Danish catches perhaps half of it and pieces the rest together during service. He does not complain \u2014 it is his second week, and nobody wants to be the new crew member who makes trouble.','Nothing was said, and so nothing changed.'], debrief:'Waiting for the person with the least power in the room to raise the problem is the most common way exclusion survives. Speaking up was available to you, cost nothing, and required no authority at all.', next:'s2'},
-        s1b:{tag:'ok', text:['A kind instinct \u2014 and better than silence. But Danish now receives a whispered, second-hand version of a briefing that everyone else is attending in full, and you have quietly taken on the role of interpreter for as long as the job lasts.'], debrief:'This treats the symptom, not the cause. The briefing is what is broken. Also notice: a workaround arranged around a colleague, rather than with a colleague, tends to feel less like support and more like being managed.', next:'s2'},
-        s1c:{tag:'best', text:['It takes three seconds. Nobody is singled out \u2014 \u201chard to follow otherwise\u201d is simply true of a noisy huddle. The pace drops, faces turn to the group, and two other crew members visibly relax.','Later, Danish sends you a message: \u201cThanks. Got everything today.\u201d'], debrief:'You changed the environment instead of asking Danish to work around a broken one. And you did it without being in charge \u2014 which is exactly the point. Most access barriers are removed by peers, in the moment.', next:'s2'},
-        s2:{text:['After service, a colleague says to you \u2014 within earshot of Danish \u2014 \u201cCan you check whether Danish understood the new table numbering? Easier if it comes from you.\u201d What do you do?'], choices:[
-          {label:'Agree \u2014 you have become the go-between, and it does keep things smooth', to:'s2a'},
-          {label:'Redirect: \u201cAsk Danish \u2014 he\u2019s right here.\u201d', to:'s2b'}
-        ]},
-        s2a:{tag:'poor', text:['You become the permanent channel. Colleagues stop addressing Danish directly, because there is now an easier route. Within a month, Danish is spoken about far more often than he is spoken to.'], debrief:'Convenient for the team, corrosive for the colleague. Once a person becomes someone to be relayed to rather than talked with, recognition is already gone \u2014 and it happened without a single unkind word.', end:true},
-        s2b:{tag:'best', text:['Mildly embarrassed, your colleague turns and asks Danish directly. Danish answers in about four seconds \u2014 he had already spotted an error in the new numbering.','The problem gets solved, by the person who saw it.'], debrief:'Three words, and the dynamic corrects itself. Speaking to a colleague rather than about a colleague is the smallest possible act of recognition \u2014 and one of the most powerful.', end:true}
-      }
-    },
-
-    {type:'h2', text:'Case two: the staff canteen'},
-    {type:'scenario',
-      title:'Wei Lin eats alone',
-      setting:'Wei Lin has an intellectual disability and joined your hospital support services team two months ago through a supported employment placement. Wei Lin is reliable, precise, and always early for a shift. At every meal break, the team drifts to the staff canteen together. Every time, Wei Lin eats alone in the changing room. Nobody decided this. It simply happened.',
-      start:'w1',
-      nodes:{
-        w1:{text:['You notice. What do you do?'], choices:[
-          {label:'Leave it \u2014 Wei Lin probably prefers it that way, and you do not want to cause discomfort', to:'w1a'},
-          {label:'Ask the job coach whether Wei Lin is allowed to join the team at break', to:'w1b'},
-          {label:'Ask, the way you would ask anyone: \u201cWei Lin, we\u2019re heading to the canteen \u2014 come along?\u201d', to:'w1c'}
-        ]},
-        w1a:{tag:'poor', text:['Nothing changes. Wei Lin continues to eat alone \u2014 not from preference, but because nobody has asked, and after two months the expectation of being asked has quietly faded.','\u201cProbably prefers it\u201d was a story that let you off the hook.'], debrief:'Assuming someone prefers exclusion is the most comfortable assumption available, and almost nobody checks it. The exclusion is not in the declining. It is in the never being asked.', next:'w2'},
-        w1b:{tag:'ok', text:['The job coach looks puzzled. \u201cYou can just ask Wei Lin \u2014 it\u2019s lunch.\u201d','You have routed an ordinary invitation through a professional intermediary. Nobody needs permission to eat with colleagues.'], debrief:'Speak to the person, not about the person. Involving a job coach or a family member in a decision a colleague can obviously make alone is a small, well-meant act of disempowerment \u2014 and it will be felt.', next:'w2'},
-        w1c:{tag:'best', text:['Wei Lin looks genuinely surprised \u2014 then says yes.','At the canteen the conversation is about the football, the aircon, and the outrageous price of chicken rice. Wei Lin has strong opinions on the chicken rice.'], debrief:'You did the ordinary thing, and the ordinary thing was the right one. Belonging is not a programme. It is an invitation, repeated, without ceremony.', next:'w2'},
-        w2:{text:['At the table, a colleague turns to you \u2014 not to Wei Lin \u2014 and asks loudly, \u201cSo what does she like to eat, ah?\u201d Wei Lin is sitting right there. What do you do?'], choices:[
-          {label:'Answer on Wei Lin\u2019s behalf \u2014 it is easier and avoids an awkward pause', to:'w2a'},
-          {label:'Redirect gently: \u201cWei Lin, what are you having today?\u201d', to:'w2b'}
-        ]},
-        w2a:{tag:'poor', text:['You answer. Wei Lin says nothing. The conversation carries on overhead, and a colleague who was finally at the table has still not joined it.','You gave the invitation. Then you took the voice.'], debrief:'Talking about a person who is sitting right there is one of the most common and most corrosive habits in this space. The invitation was necessary. It was not sufficient.', end:true},
-        w2b:{tag:'best', text:['\u201cFish soup,\u201d says Wei Lin. \u201cLess salt.\u201d','Your colleague, slightly embarrassed, asks which stall is best. Wei Lin knows exactly. The conversation now belongs to Wei Lin too.'], debrief:'One redirection, three words long, and the whole dynamic corrects itself. This is the daily, unglamorous work of recognition \u2014 available to any colleague, at any level, on any shift.', end:true}
-      }
-    },
-
-    {type:'h2', text:'Language: small shifts, real signal'},
-    {type:'text', html:'<p>Singapore\u2019s general practice is <strong>person-first language</strong> \u2014 the person before the condition. Tap each card to flip it.</p>'},
-    {type:'flipcards', pairs:[
-      {avoid:'Disabled person', use:'Person with disabilities'},
-      {avoid:'Wheelchair-bound', use:'Wheelchair user'},
-      {avoid:'Suffering from / victim of', use:'Person who has\u2026'},
-      {avoid:'Mentally retarded', use:'Person with intellectual disability'},
-      {avoid:'Deaf and dumb / deaf-mute', use:'Deaf, hard of hearing, non-verbal'},
-      {avoid:'Normal / able-bodied', use:'Persons without disabilities'}
-    ]},
-    {type:'callout', kind:'warm', label:'One nuance that matters', html:'<p>Some people prefer <strong>identity-first</strong> language \u2014 \u201cI\u2019m autistic\u201d, \u201cI\u2019m Deaf\u201d \u2014 and that is a personal choice. If a colleague states a preference, follow it without debate.</p><p>The goal was never to memorise approved vocabulary. It is to stop describing a person in terms of what is missing.</p>'},
-
-    {type:'mcq', q:'A colleague with autism gives no eye contact and a one-word answer when you say hello in the lift. What is the best read?', options:['Rudeness \u2014 worth mentioning to a supervisor','A sign of dislike \u2014 keep your distance in future','Nothing to fix \u2014 communication styles differ, and this is not about you','Stop saying hello, to avoid the awkwardness'], answer:2, why:'An unexpected response, or none, is common and is not personal. Keep greeting normally. Consistency is what builds a working relationship \u2014 withdrawing is how a colleague ends up isolated by a hundred small retreats.'},
-    {type:'mcq', q:'You are showing Wei Lin, who has an intellectual disability, how to prepare the trolleys for a shift. Which approach fits best?', options:['Explain the full routine once, thoroughly, then leave Wei Lin to it','Break it into steps, demonstrate the first one, and leave a checklist to refer back to','Ask a buddy to handle all the instructions from now on','Simplify the role until no instruction is needed'], answer:1, why:'Break it down, show rather than only tell, and leave something to check against. Routing everything through a buddy removes a colleague from a conversation about that colleague\u2019s own work \u2014 and quietly shrinking a role decides someone\u2019s potential without asking.'},
-    {type:'mcq', q:'The team is booking a year-end dinner. A colleague uses a wheelchair. What is the inclusive move?', options:['Ask the colleague to check whether the venue is suitable','Check step-free access, lift and toilet yourself before booking \u2014 then confirm with the colleague','Book somewhere central and sort out any problems on the night','Pick a place with a ramp at the door and assume the rest is fine'], answer:1, why:'Do the homework first \u2014 access should not be a tax that one colleague pays before every social event. Then confirm, because a colleague knows more about the real needs than any website does. A ramp at the entrance means nothing if the toilet is up a flight of stairs.'},
-    {type:'reflect', key:'r_m2', q:'Of the five moments \u2014 meeting someone new, communicating clearly, working side by side, offering help, including \u2014 which one felt most useful to you, and why? Which would you like to be better at?'}
-  ]
-},
-{
-  id:'m3', num:'4', time:'~20 min', title:'Examining assumptions',
-  menuSub:'Why kind assumptions get in the way \u2014 and how to notice yours',
-  lede:'The barriers that keep a colleague from being equally recognised are rarely ramps or software. More often the barrier is an assumption \u2014 usually a kind one, held by a decent person. This module puts the common ones on the table, so you can spot an assumption early, and without shame.',
-  blocks:[
-    {type:'callout', kind:'key', label:'Why this is the hardest module', html:'<p>Almost nobody at work intends to exclude anyone. Bias here rarely arrives as prejudice. It arrives as <strong>kindness</strong> (\u201cI didn\u2019t want to burden her\u201d), as <strong>pragmatism</strong> (\u201cwe just needed it done fast\u201d), and as <strong>protection</strong> (\u201cI was looking out for him\u201d).</p><p>That is exactly why it goes uncaught. Nobody thinks to question a good intention.</p><p>This module is not about finding fault \u2014 in yourself or anyone else. It is about seeing clearly.</p>'},
-
-    {type:'h2', text:'Myth or fact? You decide'},
-    {type:'text', html:'<p>Six statements you will genuinely hear in a Singapore workplace. Commit to an answer before reading the feedback \u2014 the guessing is where the learning happens.</p>'},
-    {type:'sort', items:[
-      {stmt:'Employees with disabilities are less productive.', truth:'myth', why:'It depends on fit and support \u2014 exactly as it does for everyone else. One Singapore employer who timed structured work found employees with intellectual disabilities were 30\u201340% more productive than the average worker in those roles. Match the person to the role, and the numbers take care of themselves.'},
-      {stmt:'Working alongside a colleague with a disability tends to improve how a whole team communicates.', truth:'fact', why:'Employers report exactly this. Clearer instructions, clearer schedules, better-organised handovers \u2014 introduced to support one colleague, and quickly relied on by everyone. Access changes usually turn out to be improvements that were overdue anyway.'},
-      {stmt:'It is safest never to mention the disability at all.', truth:'myth', why:'Pretending it does not exist creates awkwardness and blocks support. A respectful, private, work-focused question \u2014 \u201cwhat helps you do your best work?\u201d \u2014 is usually welcome. What is not welcome: public spotlighting, and medical curiosity dressed up as concern.'},
-      {stmt:'Disability means inability.', truth:'myth', why:'A disability affects some tasks, in some ways, in some environments. Look at what the job actually requires, and at what the environment can change \u2014 not at a blanket verdict about a person. This is the single assumption that Focal Area 4 exists to dismantle.'},
-      {stmt:'If something is wrong, a colleague with a disability will say so.', truth:'myth', why:'New joiners, junior staff, and anyone worried about being labelled difficult rarely speak up \u2014 and a colleague with a disability has often learned, painfully, what happens after speaking up. Noticing, and making it safe to ask, is everyone\u2019s job.'},
-      {stmt:'Workplace adjustments are usually expensive.', truth:'myth', why:'Most cost nothing at all: a seating change, written instructions, one voice at a time, captions switched on, a shelf lowered. Where equipment or job redesign is genuinely needed, national funding exists \u2014 and HR is the route to it (Module 5).'}
-    ]},
-    {type:'callout', kind:'dyk', label:'Did you know?', html:'<p>One Singapore employer who measured structured work found employees with intellectual disabilities were <strong>30\u201340% more productive</strong> than the average worker in those roles. The right role, matched to the right person, is simply good business.</p>'},
-
-    {type:'h2', text:'Four places assumptions do the damage'},
-    {type:'text', html:'<p>A colleague can be employed, paid correctly and treated politely \u2014 and still never be recognised. It tends to happen in four places. None of the four feels like discrimination from the inside.</p>'},
-    {type:'accordion', items:[
-      {icon:'chat', bg:'#E8EFF9', fg:'#1A4F9C', title:'What we assume a person can handle', sub:'\u201cBetter not put her on the counter.\u201d',
-       html:'<p>The most common and most invisible barrier: deciding what a colleague can cope with, without ever asking.</p><p>It shows up in who is put on the busy shift, who is trusted with the customer, who is asked to cover, who gets the interesting job and who gets the safe one. It shows up in who you choose to partner with, and who you never think to approach for help.</p><h5>The useful question</h5><p><em>Would this be offered to a colleague at the same level who does not have a disability?</em> If yes, offer it. Then let the answer be whatever it is.</p>'},
-      {icon:'bulb', bg:'#EFF6DE', fg:'#4C6B1E', title:'What we assume a struggle means', sub:'\u201cIt must be the condition.\u201d',
-       html:'<p>When a colleague with a disability finds something hard, the disability becomes the explanation. When anyone else finds the same thing hard, we look at the workload, the instructions, a change in the system, or a rough week at home.</p><h5>The useful question</h5><p><em>Would I reach for this explanation if the colleague had no disability?</em> Very often the real cause is something in the environment \u2014 an unclear instruction, an inaccessible tool, a briefing nobody could follow.</p>'},
-      {icon:'star', bg:'#FBF0DC', fg:'#A66B12', title:'What we assume about growth', sub:'\u201cI left him out of the training \u2014 to protect him.\u201d',
-       html:'<p>Training quietly not mentioned. A new machine someone else is shown first. A chance to act up, handed elsewhere. Each is defensible on its own; together, a career stops moving.</p><h5>The useful question</h5><p><em>Am I protecting a colleague, or deciding a colleague\u2019s future without asking?</em> If access is the genuine obstacle \u2014 a venue, a tool, a format \u2014 then fix the access. Do not withdraw the opportunity.</p>'},
-      {icon:'people', bg:'#F9E9E4', fg:'#C4553B', title:'Who gets heard', sub:'Whose silence is misread.',
-       html:'<p>Recognition is audible. Sit in one briefing and simply count: who is interrupted, who gets asked directly, whose good idea gets repeated a minute later by somebody else and credited to that somebody else.</p><h5>The useful move</h5><p>Say the name and give the credit, out loud, in the moment: <em>\u201cThat was Farhan\u2019s point \u2014 Farhan, say more?\u201d</em> Any colleague can do this. No authority required.</p>'}
-    ]},
-
-    {type:'h2', text:'The kindness traps'},
-    {type:'text', html:'<p>Three habits that feel generous, and are not. All three are most common among people who are \u2014 correctly \u2014 considered supportive colleagues.</p>'},
-    {type:'tiles', items:[
-      {icon:'shield', bg:'#EDE9F7', fg:'#6B5CA5', h:'Over-helping', p:'Doing what a colleague can do perfectly well alone. Every time a task is taken over, the message received is: I did not think you could. Offer, wait, and let the answer be no.'},
-      {icon:'star', bg:'#EDE9F7', fg:'#6B5CA5', h:'The inspiration trap', p:'\u201cSo inspiring, just for showing up!\u201d Treating ordinary competence as heroism marks a colleague as fundamentally different \u2014 and quietly lowers the bar being set.'},
-      {icon:'chat', bg:'#EDE9F7', fg:'#6B5CA5', h:'The silent cover-up', p:'Quietly redoing a colleague\u2019s work, or never mentioning a mistake. It feels gentle. It communicates: I expect nothing of you, and I do not see you growing here.'}
-    ]},
-
-    {type:'h2', text:'The case: something has changed'},
-    {type:'scenario',
-      title:'Priya\u2019s difficult month',
-      setting:'You work alongside Priya at a polyclinic, on the patient services counter. Priya has been a steady, capable colleague for two years \u2014 but this month she has been missing things at handover, has gone quiet in team huddles, and twice asked patients to repeat themselves several times. You have also noticed what might be a new hearing aid. You are her colleague, not her supervisor.',
-      start:'p1',
-      nodes:{
-        p1:{text:['What do you do?'], choices:[
-          {label:'Nothing \u2014 not your business, and the supervisor will notice eventually', to:'p1a'},
-          {label:'Ask directly: \u201cIs that a hearing aid? Is that why you\u2019ve been missing things?\u201d', to:'p1b'},
-          {label:'Mention it quietly to two other colleagues, so the team can watch out for her', to:'p1c'},
-          {label:'Check in as a colleague: \u201cYou\u2019ve seemed a bit off this month \u2014 everything okay? Anything I can do?\u201d', to:'p1d'}
-        ]},
-        p1a:{tag:'poor', text:['Weeks pass. Priya keeps struggling, keeps saying nothing, and starts to look exhausted. She has begun to think the team has noticed and decided not to care.','Eventually someone raises it \u2014 as a performance problem.'], debrief:'Waiting for a colleague to ask for help assumes it feels safe to ask. Very often it does not. Noticing is not interfering; a colleague noticing early is frequently what prevents a small difficulty becoming a formal problem.', next:'p2'},
-        p1b:{tag:'poor', text:['Priya stiffens. Whether or not it is a hearing aid is private medical information \u2014 and you have just tied a suspected condition to a judgement about her work, in one sentence.','She says \u201cI\u2019m fine\u201d, and tells you nothing for the rest of the year.'], debrief:'Never diagnose. Never make disclosure the price of support. Health information belongs to a person, and a person shares it only when it feels safe. Your legitimate ground is the work you can see \u2014 and how you might help.', next:'p2'},
-        p1c:{tag:'poor', text:['By the end of the week, the version circulating in the pantry is that Priya is going deaf and cannot cope. Priya hears it from a colleague who assumed she already knew.','The concern was real. The effect was gossip.'], debrief:'Concern shared sideways is gossip, however kindly it starts. Speak to the person, not about the person \u2014 the same principle as the canteen table in Module 3, at higher stakes.', next:'p2'},
-        p1d:{tag:'best', text:['Priya hesitates, then tells you she has sudden hearing loss in one ear. The noisy counter and the rapid handovers have become exhausting. She has told nobody, because she is afraid of being seen as unable to do the job.','\u201cPlease don\u2019t say anything,\u201d she adds.'], debrief:'You described what you noticed about the work, asked openly, and offered help \u2014 without diagnosing anything. That made it safe enough to speak. Notice her fear: being seen as unable. That fear is why colleagues stay silent while problems grow.', next:'p2'},
-        p2:{text:['Priya has asked you to keep it to yourself. But you can see the handover process is the real pinch point. What now?'], choices:[
-          {label:'Keep the secret and say nothing to anyone \u2014 a promise is a promise', to:'p2a'},
-          {label:'Tell the supervisor about her hearing loss, so support can be arranged properly', to:'p2b'},
-          {label:'Help where you can, and ask Priya how she would like the handover issue raised \u2014 and by whom', to:'p2c'}
-        ]},
-        p2a:{tag:'ok', text:['You start writing the handover notes down for Priya without being asked, which genuinely helps. But nothing else changes, the counter stays noisy, and Priya carries on alone \u2014 grateful, and still exhausted.'], debrief:'Loyalty is not the same as support. Keeping confidence is right; leaving a colleague with no path to formal help is not the whole job. The missing step is to ask Priya what she wants to happen next.', end:true},
-        p2b:{tag:'poor', text:['Priya learns that her medical information reached the supervisor before she was ready. Whatever support follows, she now knows what happens when she confides in a colleague.','She will not make that mistake twice \u2014 with you, or with anyone.'], debrief:'Her information, her decision. Confidentiality is not merely courtesy; it is the foundation that makes it survivable for anyone on the team to speak up in future. Well-meant disclosure is still disclosure.', end:true},
-        p2c:{tag:'best', text:['You suggest writing the handover on the board instead of calling it across a noisy counter \u2014 a change the whole team quietly appreciates.','Then you ask Priya: \u201cWould it help if this went to HR? I can come with you, or stay out of it \u2014 your call.\u201d She thinks about it, and a week later she goes.'], debrief:'Fix what is fixable, keep the confidence, and hand the decision back to the person it belongs to. You did not solve it alone \u2014 and you were never supposed to. Note that the fix improved the handover for everyone.', end:true}
-      }
-    },
-
-    {type:'callout', kind:'key', label:'The rule of thumb that covers most of it', html:'<p>Talk about the <strong>work you can see</strong>, not the <strong>condition you suspect</strong>. Offer support first. And what a colleague tells you in confidence stays with you \u2014 the decision to share it is never yours.</p>'},
-
-    {type:'mcq', q:'Mei uses a wheelchair and has never been asked to cover the service counter, although the counter is step-free and she is trained for it. Asked why, a colleague says: \u201cWe didn\u2019t want to burden her.\u201d What is happening?', options:['Reasonable protection of a colleague','A kind assumption that quietly removes an opportunity \u2014 without ever asking Mei','Normal practice, for safety reasons','Nothing much, as long as her pay is unaffected'], answer:1, why:'Kind intent, exclusionary effect. An opportunity was withdrawn on the basis of an assumption nobody tested \u2014 least of all with Mei. The inclusive move is to ask, and to let the answer be hers. Withheld chances are how a career quietly stops moving.'},
-    {type:'mcq', q:'Farhan, who is blind, makes a strong point in a team huddle. A minute later another colleague repeats it and gets the credit. What is the most useful thing to do?', options:['Say nothing \u2014 raising it would embarrass everyone','Mention it to Farhan privately afterwards, so he feels supported','Say it in the room: \u201cThat was Farhan\u2019s point \u2014 Farhan, do you want to say more?\u201d','Report the colleague afterwards'], answer:2, why:'Recognition has to happen where the room can see it. A private word afterwards is sympathy; naming the contribution in the moment is recognition \u2014 and it takes no authority whatsoever. This is exactly the kind of moment no policy will ever reach.'},
-    {type:'reflect', key:'r_m3', q:'Which idea in this module was most surprising, or sat least comfortably with you? There is no wrong answer \u2014 noticing the discomfort is the point.'}
-  ]
-},
-{
-  id:'m5', num:'5', time:'~22 min', title:'Recap, support & knowledge check',
-  menuSub:'What to carry with you, where to turn for help, and the final check',
-  lede:'Everything in this course compresses into a handful of moves \u2014 and one safety net. Check that it has stuck, compare your confidence with where you started, and take one commitment with you.',
-  blocks:[
-    {type:'callout', kind:'key', label:'Back to where this started', html:'<p>Focal Area 4 of the Enabling Masterplan 2030 asks that by 2030, persons with disabilities who can work are <strong>equally recognised for their abilities, knowledge, and skills</strong>.</p><p>You now have what that actually requires: an understanding of what a colleague\u2019s working day contains, practical moves for the moments that matter, and honesty about the assumptions that get in the way. None of it is complicated. All of it is yours to use.</p>'},
-
-    {type:'h2', text:'The four rules'},
-    {type:'tiles', items:[
-      {icon:'chat', bg:'#E8EFF9', fg:'#1A4F9C', h:'1 \u00b7 Ask the person', p:'A colleague is the expert on what works. Ask privately, respectfully, about the work \u2014 then listen to the actual answer.'},
-      {icon:'bulb', bg:'#EFF6DE', fg:'#4C6B1E', h:'2 \u00b7 Think before you speak', p:'Person-first language by default. If a colleague states a different preference, follow it without debate.'},
-      {icon:'shield', bg:'#FBF0DC', fg:'#A66B12', h:'3 \u00b7 Avoid assumptions', p:'The disability type tells you where to start asking. It never tells you what someone cannot do.'},
-      {icon:'people', bg:'#F9E9E4', fg:'#C4553B', h:'4 \u00b7 Ask before you help', p:'Offer, wait, then ask how. \u201cNo thanks\u201d is a complete answer. Help given without consent is not help.'}
-    ]},
-
-    {type:'h2', text:'The five moments, in one line each'},
-    {type:'text', html:'<ul class="plain"><li><strong>Meeting a new colleague</strong> \u2014 introduce yourself normally, use the name, pass on the unwritten rules.</li><li><strong>Communicating clearly</strong> \u2014 be concrete, leave something to check back against, drop the idioms.</li><li><strong>Working side by side</strong> \u2014 hand over context, notice what the environment is doing, do not quietly take over.</li><li><strong>Offering help</strong> \u2014 offer, wait, then ask how.</li><li><strong>Including</strong> \u2014 invite, every time. The exclusion is in never being asked.</li></ul>'},
-
-    {type:'h2', text:'When it is bigger than you'},
-    {type:'text', html:'<p>Everything above is within your reach, whatever your job and whatever your level: how you speak, how you brief, how you offer help, what you assume, who you invite. That is most of it.</p><p>But some things are not yours to solve alone \u2014 and trying to is its own kind of mistake.</p>'},
-    {type:'callout', kind:'key', label:'Your first call is HR', html:'<p>Your organisation, not you, holds the formal levers: workplace adjustments, equipment, job redesign, and access to national support and job coaches through <strong>SG Enable</strong>, Singapore\u2019s focal agency for disability and inclusion.</p><p>You do not need to know how any of that works. You need to know <strong>who to call</strong> \u2014 and that is HR.</p>'},
-    {type:'tiles', items:[
-      {icon:'shield', bg:'#E8EFF9', fg:'#1A4F9C', h:'Bring in HR when\u2026', p:'A colleague needs a workplace adjustment \u00b7 something has been disclosed and you are unsure what to do \u00b7 a barrier needs fixing beyond your reach \u00b7 you are simply out of your depth.'},
-      {icon:'people', bg:'#EFF6DE', fg:'#4C6B1E', h:'How to raise it well', p:'Describe the work, never the health. \u201cThe handover is hard to follow at the counter \u2014 could we write it on the board?\u201d Not: \u201cI think Priya has a hearing problem.\u201d'},
-      {icon:'chat', bg:'#FBF0DC', fg:'#A66B12', h:'Protect the confidence', p:'What a colleague tells you privately stays with you. Ask first \u2014 even before going to HR. The decision to disclose is never yours to make.'},
-      {icon:'star', bg:'#F9E9E4', fg:'#C4553B', h:'Do not wait to be asked', p:'Speaking up is hard for anyone who fears being seen as difficult. Notice early. A barrier you spot is a barrier you can raise \u2014 without naming anyone.'}
-    ]},
-    {type:'callout', kind:'warm', label:'The line to remember', html:'<p><strong>You are not expected to solve this alone. You are expected to notice, to respond with respect, and to know who to call.</strong></p>'},
-    {type:'callout', kind:'note', label:'This was Level 0', html:'<p>This course is a foundation \u2014 awareness, not expertise. Deeper training exists for those who want it or need it in a specific role, including structured workshops on recruitment, workplace accommodation, assistive technology and supporting positive behaviour. Ask HR what is available.</p>'},
-
-    {type:'h2', text:'Knowledge check'},
-    {type:'text', html:'<p>Ten questions covering everything in this course. Instant feedback on each. <strong>Full marks are required to complete the course</strong> \u2014 not because this is an exam, but because every one of these moments matters to a real colleague. Retake as often as you like; the answer options are reshuffled each time. Your answers and score stay on this device.</p>'},
-    {type:'quiz'},
-    {type:'confidence', slot:'confidenceEnd', q:'Now \u2014 how confident do you feel interacting with and supporting a colleague with a disability?', compare:true},
-    {type:'h2', text:'Your commitment'},
-    {type:'reflect', key:'r_commit', q:'Write one specific thing you will do differently in the next two weeks \u2014 a habit, a conversation, an invitation. Recognition is built from small acts, repeated. Name one.', ph:'e.g. \u201cI will ask the new colleague on my shift to join us at break \u2014 every time, not just once.\u201d'},
-    {type:'html', node:()=>m5GateNode()},
-    {type:'html', node:()=>{
-      const w = el(`<div><div class="callout key"><span class="co-label">Take your reflections with you</span><p>Your notes from all five modules live only in this browser. Download a text file to keep, or to talk through with your HR partner.</p><p style="margin-top:12px"><button class="btn small" id="dlBtn">Download my reflections (.txt)</button></p></div>
-      <div class="callout note"><span class="co-label">Where to go next</span><p><a href="https://www.sgenable.sg" target="_blank" rel="noopener">sgenable.sg</a> \u2014 Singapore\u2019s first stop for disability and inclusion, with guides, training and resources for employers and employees alike.</p></div></div>`);
-      w.querySelector('#dlBtn').addEventListener('click',()=>{
-        const lines = ['DISABILITY AWARENESS@WORK \u2014 MY REFLECTIONS','Generated '+new Date().toLocaleString(),''];
-        if(state.confidenceStart) lines.push('Confidence at start: '+state.confidenceStart+'/5');
-        if(state.confidenceEnd) lines.push('Confidence at end:   '+state.confidenceEnd+'/5');
-        if(state.quizScore!==null) lines.push('Best quiz score:     '+state.quizScore+'/10');
-        lines.push('');
-        Object.values(state.reflections).forEach(r=>{ if(r.a&&r.a.trim()){ lines.push('Q: '+r.q,'A: '+r.a.trim(),''); }});
-        if(lines.length<8) lines.push('(No written reflections yet \u2014 go back and jot a few!)');
-        const blob = new Blob([lines.join('\n')],{type:'text/plain'});
-        const a = document.createElement('a');
-        a.href = URL.createObjectURL(blob); a.download = 'da-at-work-reflections.txt'; a.click();
-        URL.revokeObjectURL(a.href);
-      });
-      return w;
-    }}
-  ]
-}
-];
-
-/* ---------- final quiz: 10 items ----------
-   6 knowledge (2 per LO) \u00b7 3 situational \u00b7 1 application
-------------------------------------------------- */
-const QUIZ = [
-  /* --- KNOWLEDGE \u00b7 LO1 \u00b7 Understanding disability types (Module 2) --- */
-  {lo:'Knowledge \u00b7 LO1', q:'Disability in Singapore is broadly grouped into four types. Which list is correct?', options:['Physical disability, sensory impairment, intellectual disability, autism','Physical, mental illness, chronic illness, autism','Sensory, learning, mobility, speech','Visible disabilities and invisible disabilities'], answer:0, why:'The four broad groups are physical disability, sensory impairment (hearing and vision), intellectual disability, and autism. Mental health conditions are a related but separate area, with separate support and guidance.'},
-  {lo:'Knowledge \u00b7 LO1', q:'The autism spectrum is best pictured as\u2026', options:['A straight line running from mild to severe','A spiderweb \u2014 communication, sensory processing, social interaction and routine, with each person sitting differently on each strand','A clinical grade assigned at diagnosis','A childhood phase that fades in adulthood'], answer:1, why:'Two people with the same diagnosis can have opposite profiles \u2014 one untroubled by noise but overwhelmed by bright light, another exactly the reverse. A spectrum is not a ranking. Meet the person, not the label.'},
-
-  /* --- KNOWLEDGE \u00b7 LO2 \u00b7 Everyday practice (Module 3) --- */
-  {lo:'Knowledge \u00b7 LO2', q:'A colleague who is hard of hearing did not catch what you said. What works best?', options:['Repeat the same words, more loudly','Say it again in different words, with your face visible','Give up and send a message later','Ask another colleague to pass it on'], answer:1, why:'Rephrase, do not repeat \u2014 and keep your face visible. Raising your volume rarely helps and often distorts speech. If the huddle itself is the problem, fix the huddle: one voice at a time, faces up.'},
-  {lo:'Knowledge \u00b7 LO2', q:'You are walking with a colleague who is blind to an unfamiliar part of the building. What is correct practice?', options:['Take hold of an arm and steer the way','Offer your arm, let your colleague take it, and describe the route as you walk','Walk ahead and give directions over your shoulder','Hold onto a shoulder from behind and guide'], answer:1, why:'Offer \u2014 never grab, steer or push. Your colleague takes your arm or elbow, and you narrate the space (\u201cthree steps down, then a left\u201d) so a mental map can be built. Being specific out loud is the whole skill.'},
-
-  /* --- KNOWLEDGE \u00b7 LO3 \u00b7 Assumptions (Module 4) --- */
-  {lo:'Knowledge \u00b7 LO3', q:'Why is it a problem to tell a colleague with a disability: \u201cYou are so inspiring, just for turning up to work\u201d?', options:['It is not a problem \u2014 encouragement is always welcome','It treats ordinary competence as heroism, marks the colleague as different, and quietly lowers the bar being set','It is only a problem if said in public','It is fine, provided the person seems pleased'], answer:1, why:'This is the inspiration trap. Praise the work, as you would for anyone. Praising someone simply for existing at work says: I did not expect this of you \u2014 which is the opposite of being equally recognised.'},
-  {lo:'Knowledge \u00b7 LO3', q:'A colleague with a disability is struggling with a task. What is the disciplined first move?', options:['Assume the disability is the cause \u2014 it is the obvious explanation','Rule out the ordinary causes first: unclear instructions, workload, a system change, a rough week','Say nothing and quietly redo the work','Suggest the role is reduced'], answer:1, why:'When anyone else struggles we look at workload, instructions or a change in the system. Apply the same reasoning here. Very often the real cause is something in the environment \u2014 which means it is something that can be fixed.'},
-
-  /* --- SITUATIONAL x3 --- */
-  {lo:'Situational', q:'At a noisy shift huddle, two colleagues start talking over each other while facing away. Danish, who is deaf, has clearly stopped following. You are not the one running the huddle. What do you do?', options:['Nothing \u2014 it is not your huddle, and speaking up would be awkward','Stand beside Danish and whisper a running summary','Say out loud: \u201cSorry \u2014 one at a time, and can we face the group? Hard to follow otherwise.\u201d','Recap the whole briefing for Danish afterwards'], answer:2, why:'Three seconds, no authority required, and nobody is singled out \u2014 \u201chard to follow otherwise\u201d is simply true of a noisy huddle. Whispering summaries and recapping later both leave the broken briefing untouched, and cast one colleague as a permanent exception to be managed.'},
-  {lo:'Situational', q:'At the staff canteen, a colleague turns to you \u2014 not to Wei Lin, who is sitting right there \u2014 and asks loudly, \u201cSo what does she like to eat, ah?\u201d What is the best response?', options:['Answer on Wei Lin\u2019s behalf \u2014 it is quicker and avoids an awkward pause','Redirect gently: \u201cWei Lin, what are you having today?\u201d','Explain Wei Lin\u2019s disability to the colleague afterwards','Say nothing \u2014 it would embarrass everyone'], answer:1, why:'Talking about a person who is sitting right there is one of the most corrosive habits in this space. One redirection, three words long, hands the conversation back to the person it belongs to \u2014 and the whole dynamic corrects itself.'},
-  {lo:'Situational', q:'Priya, a colleague, confides that she has sudden hearing loss and asks you to keep it to yourself. You can see the noisy verbal handover is the real problem. What do you do?', options:['Keep the secret and say nothing further \u2014 a promise is a promise','Tell the supervisor about her hearing loss, so support can be arranged properly','Suggest writing the handover on the board, and ask Priya how \u2014 and by whom \u2014 she would like anything else raised','Tell a couple of trusted colleagues, so the team can look out for her'], answer:2, why:'Fix what is fixable (a written handover helps the whole team), keep the confidence, and hand the decision back to the person it belongs to. Passing it to a supervisor or to colleagues \u2014 however kindly meant \u2014 is still disclosing information that was never yours to share.'},
-
-  /* --- APPLICATION x1 --- */
-  {lo:'Application', q:'Your team is replacing spoken shift briefings with a new mobile app. A colleague on the team is blind. Applying what this course has taught, what is the best first step?', options:['Assume it will be fine \u2014 an app is text, and text can be read aloud by technology','Keep giving spoken briefings to that one colleague, and use the app for everyone else','Ask the colleague whether the app works with a screen reader, and what would work best \u2014 then adjust before rolling it out','Ask HR to purchase specialist software before mentioning the change to anyone'], answer:2, why:'Ask \u2192 Listen \u2192 Adjust, applied to something new. Assuming access invites failure; a separate arrangement for one person is exclusion with extra steps; and going to HR before speaking to your colleague skips the only real expert. Ask first, then involve HR if equipment or funding is genuinely needed.'}
-];
+/* ---- course-shape numbers, computed from whatever content actually
+   loaded. Used anywhere the course used to hardcode "five modules",
+   "three scenarios" or "~90 minutes", so those figures stay correct
+   automatically whether this deployment has 3 modules or 8. ---- */
+const NUM_WORDS = ['zero','one','two','three','four','five','six','seven','eight','nine','ten','eleven','twelve'];
+function numWord(n){ return NUM_WORDS[n] || String(n); }
+const SCENARIO_COUNT = MODULES.reduce((n,m)=> n + (m.blocks||[]).filter(b=>b.type==='scenario').length, 0);
+const TOTAL_MINUTES = MODULES.reduce((sum,m)=>{ const mm = /(\d+)/.exec(m.time||''); return sum + (mm?parseInt(mm[1],10):0); }, 0);
 
 function renderDial(score, total, pass){
   const pct = Math.round(score/total*100);
@@ -1187,12 +965,14 @@ function passMark(){ return Math.min((CONFIG.passThreshold|0)||QUIZ.length, QUIZ
 function certEligible(){ return allModulesDone() && (state.quizScore||0) >= passMark(); }
 
 function m5GateNode(){
-  const prevDone = MODULES.filter(m=>m.id!=='m5').every(m=>state.completed[m.id]);
+  const prevDone = MODULES.filter(m=>m!==FINAL_MODULE).every(m=>state.completed[m.id]);
   const full = (state.quizScore||0) >= passMark();
+  const priorCount = MODULES.length-1;
+  const priorLabel = priorCount<=1 ? 'Module 1' : `Modules 1&ndash;${priorCount}`;
   const w = el(`<div id="m5gate" class="callout ${certEligible()?'key':'warm'}">
     <span class="co-label">Course completion status</span>
     <ul class="cert-reqs">
-      <li><span class="req-dot ${prevDone?'met':'unmet'}">${prevDone?'&#10003;':'!'}</span> Modules 1&ndash;4 marked complete ${prevDone?'':' — <em>check the module list</em>'}</li>
+      <li><span class="req-dot ${prevDone?'met':'unmet'}">${prevDone?'&#10003;':'!'}</span> ${priorLabel} marked complete ${prevDone?'':' — <em>check the module list</em>'}</li>
       <li><span class="req-dot ${full?'met':'unmet'}">${full?'&#10003;':'!'}</span> Knowledge check passed (at least ${passMark()} of ${QUIZ.length}) ${full?'':(state.quizScore!==null?` — <em>best so far: ${state.quizScore}/${QUIZ.length}. Retake above.</em>`:' — <em>take the quiz above</em>')}</li>
     </ul>
     ${certEligible()?'<p><a class="btn small" href="#/cert">Claim your certificate &rarr;</a></p>': (prevDone&&full ? '<p>Both requirements met — click <strong>Complete the course</strong> in your quiz results above.</p>' : '<p>Meet both requirements, then mark this module complete to unlock your downloadable certificate.</p>')}
@@ -1205,9 +985,9 @@ function m6Actions(){
   const best = state.quizScore;
   if((best||0)>=passMark()){
     box.appendChild(el('<span class="score-flag pass">Passed: '+best+' / '+QUIZ.length+' &#10003;</span>'));
-    const fin = el(`<button class="btn">${state.completed['m5']?'View certificate &rarr;':'Complete the course &rarr;'}</button>`);
+    const fin = el(`<button class="btn">${state.completed[FINAL_MODULE.id]?'View certificate &rarr;':'Complete the course &rarr;'}</button>`);
     fin.addEventListener('click',()=>{
-      state.completed['m5']=true; save(); updateRibbon();
+      state.completed[FINAL_MODULE.id]=true; save(); updateRibbon();
       location.hash = certEligible() ? '#/cert' : '#/menu';
     });
     box.appendChild(fin);
@@ -1268,7 +1048,7 @@ function viewVideo(){
 
 function viewCert(){
   if(!certEligible()){
-    const w = el(`<div class="certwrap"><h1 style="color:var(--deep)">Certificate locked</h1><p class="sub" style="color:var(--ink-soft)">Finish all five modules and reach the pass mark on the knowledge check to unlock your certificate.</p></div>`);
+    const w = el(`<div class="certwrap"><h1 style="color:var(--deep)">Certificate locked</h1><p class="sub" style="color:var(--ink-soft)">Finish all ${numWord(MODULES.length)} modules and reach the pass mark on the knowledge check to unlock your certificate.</p></div>`);
     w.appendChild(m5GateNode());
     w.appendChild(el(`<p><a class="btn secondary small" href="#/m/5">&larr; Back to Module 5</a></p>`));
     return w;
@@ -1290,8 +1070,8 @@ function viewCert(){
       <div class="c-sub">Disability Awareness for the Singapore Workplace &middot; aligned to Enabling Masterplan 2030</div>
       <div class="c-line">This certifies that</div>
       <div class="c-name" id="cName">${esc(state.learnerName||'________________')}</div>
-      <div class="c-line">has completed all five modules of this self-paced course,<br>including three applied case scenarios, and passed the knowledge check.</div>
-      <div class="c-meta"><span>Date<br><strong id="cDate">${dateStr}</strong></span><span>Knowledge check<br><strong>${QUIZ.length} / ${QUIZ.length}</strong></span><span>Duration<br><strong>~90 minutes</strong></span></div>
+      <div class="c-line">has completed all ${numWord(MODULES.length)} modules of this self-paced course,<br>including ${numWord(SCENARIO_COUNT)} applied case scenarios, and passed the knowledge check.</div>
+      <div class="c-meta"><span>Date<br><strong id="cDate">${dateStr}</strong></span><span>Knowledge check<br><strong>${state.quizScore!=null?state.quizScore:QUIZ.length} / ${QUIZ.length}</strong></span><span>Duration<br><strong>~${TOTAL_MINUTES} minutes</strong></span></div>
       <div class="c-foot">Certificate ID: <strong id="cVerify">\u2014</strong> &middot; Issued by InclusionEdge &middot; Disability Awareness@Work</div>
     </div>
     <div class="cert-actions">
@@ -1352,10 +1132,10 @@ function viewCert(){
     x.fillText('This certifies that', 800, 470);
     x.fillStyle='#1E2A3C'; x.font='800 64px "Bricolage Grotesque", Arial'; x.fillText(state.learnerName||'________________', 800, 556);
     x.fillStyle='#4A5A70'; x.font='28px "Atkinson Hyperlegible", Arial';
-    x.fillText('has completed all five modules of this self-paced course, including three applied', 800, 640);
+    x.fillText('has completed all '+numWord(MODULES.length)+' modules of this self-paced course, including '+numWord(SCENARIO_COUNT)+' applied', 800, 640);
     x.fillText('case scenarios, and passed the knowledge check.', 800, 682);
     x.font='700 30px "Atkinson Hyperlegible", Arial'; x.fillStyle='#0F3568';
-    x.fillText('Date: '+dateStr+'      Knowledge check: '+QUIZ.length+' / '+QUIZ.length+'      Duration: ~90 minutes', 800, 800);
+    x.fillText('Date: '+dateStr+'      Knowledge check: '+(state.quizScore!=null?state.quizScore:QUIZ.length)+' / '+QUIZ.length+'      Duration: ~'+TOTAL_MINUTES+' minutes', 800, 800);
     x.fillStyle='#4A5A70'; x.font='20px "Atkinson Hyperlegible", Arial';
     x.fillText('Certificate ID: '+verifyCode()+'  \u00B7  Issued by InclusionEdge  \u00B7  Disability Awareness@Work', 800, 1000);
     /* logos: draw whichever are already loaded on the page */
@@ -1403,13 +1183,14 @@ function buildConfigJs(c){
 
 function viewAdminSetup(){
   const v = el(`<div class="codegen">
-    <h1 style="color:var(--deep);font-size:1.6rem;margin-bottom:8px">Admin password setup</h1>
-    <p class="sub" style="color:var(--ink-soft);margin-bottom:18px">Type a new admin password to generate its hash. Copy the hash into <strong>adminHash</strong> in your config.js (or paste it into the Admin panel\u2019s Security field). Only the hash is stored \u2014 never the password itself.</p>
-    <input id="apInput" type="text" autocomplete="off" placeholder="New admin password" aria-label="New admin password" style="width:100%;border:1.5px solid var(--line);border-radius:12px;padding:14px 16px;font-family:inherit;font-size:1rem;background:var(--card)">
-    <code id="apOut" style="display:block;background:var(--card);border:1px solid var(--line);border-radius:10px;padding:12px;margin-top:10px;font-size:.85rem;word-break:break-all">adminHash appears here\u2026</code>
+    <h1 style="color:var(--deep);font-size:1.6rem;margin-bottom:8px">Set your admin password</h1>
+    <p class="sub" style="color:var(--ink-soft);margin-bottom:18px">Type the password you want to use to open the Admin panel. As you type, this page scrambles it into a code below — that scrambled code is what actually gets saved, never the password itself, so nobody can read your password by opening this website's files. Copy the scrambled code and paste it into the <strong>Admin password hash</strong> field in the Admin panel (<code>#/admin</code> → Security), then generate and upload a fresh config.js. Write your real password down somewhere safe — this page cannot recover it for you later.</p>
+    <input id="apInput" type="text" autocomplete="off" placeholder="Type your new admin password here" aria-label="New admin password" style="width:100%;border:1.5px solid var(--line);border-radius:12px;padding:14px 16px;font-family:inherit;font-size:1rem;background:var(--card)">
+    <p class="hintline" style="margin-top:10px">Scrambled code — copy this into the Admin password hash field:</p>
+    <code id="apOut" style="display:block;background:var(--card);border:1px solid var(--line);border-radius:10px;padding:12px;margin-top:6px;font-size:.85rem;word-break:break-all">Start typing above to see the code appear here&hellip;</code>
   </div>`);
   const inp=v.querySelector('#apInput'), out=v.querySelector('#apOut');
-  inp.addEventListener('input',()=>{ out.textContent = inp.value.trim() ? codeHash(inp.value) : 'adminHash appears here\u2026'; });
+  inp.addEventListener('input',()=>{ out.textContent = inp.value.trim() ? codeHash(inp.value) : 'Start typing above to see the code appear here\u2026'; });
   return v;
 }
 
@@ -1418,11 +1199,11 @@ function viewAdmin(){
   if(!viewAdmin._ok){
     const g = el(`<div class="gatewrap">
       <div class="lockicon"><svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="4.5" y="10" width="15" height="10" rx="2.5"/><path d="M8 10V7.5a4 4 0 0 1 8 0V10"/></svg></div>
-      <h1>Admin</h1><p class="sub">Enter the admin password.</p>
-      <div class="gate-err" id="aerr">Incorrect password.</div>
+      <h1>Course administrator panel</h1><p class="sub">This area is for whoever manages this course's settings — enter the admin password to continue.</p>
+      <div class="gate-err" id="aerr">That password isn\u2019t recognised. Please try again.</div>
       <input id="apw" type="password" autocomplete="off" placeholder="Admin password" aria-label="Admin password">
-      <button class="btn" id="apwGo" style="width:100%;justify-content:center">Open panel &rarr;</button>
-      <p class="gate-note">No admin password is set yet? Visit <code>#/adminsetup</code> to create one, then add it to config.js.</p>
+      <button class="btn" id="apwGo" style="width:100%;justify-content:center">Open the admin panel &rarr;</button>
+      <p class="gate-note">First time here, or forgotten the password? Go to <code>#/adminsetup</code> to set a new one, then update <strong>adminHash</strong> in config.js with the code it gives you.</p>
     </div>`);
     const pw=g.querySelector('#apw');
     function tryPw(){
@@ -1438,56 +1219,64 @@ function viewAdmin(){
   /* working copy of current config */
   const c = JSON.parse(JSON.stringify(CONFIG));
   c.orgs = c.orgs.map(o=>Object.assign({hash:'',label:'',email:'',logo:''},o));
-  const loadedFrom = (typeof window!=='undefined' && window.DAW_CONFIG) ? 'config.js (external file)' : 'built-in defaults (config.js not found)';
+  const loadedFrom = (typeof window!=='undefined' && window.DAW_CONFIG) ? 'config.js (external file)' : 'built-in defaults (config.js not found — the site is running on fallback settings)';
   const v = el(`<div class="admin">
-    <h1>Admin configuration</h1>
-    <p class="sub">Edit settings, then download a fresh <strong>config.js</strong> and upload it beside index.html. Changes take effect for all learners on their next load. Nothing here is saved automatically.</p>
-    <div class="callout note" style="margin-bottom:18px"><span class="co-label">Currently live on this page</span>
-      <p style="font-size:.86rem">Config source: <strong>${loadedFrom}</strong><br>
-      Pass mark: <strong>${CONFIG.passThreshold}/${QUIZ.length}</strong> &middot; Video skip: <strong>${CONFIG.videoSkip?'on':'off'}</strong> &middot; Access days: <strong>${CONFIG.accessDays}</strong> &middot; Orgs: <strong>${CONFIG.orgs.map(o=>o.label).join(', ')||'none'}</strong></p>
-      <p style="font-size:.8rem;color:var(--ink-soft);margin-top:8px">If this doesn\u2019t match your latest config.js, your browser is showing a cached copy \u2014 hard-refresh with <strong>Ctrl/Cmd + Shift + R</strong>.</p>
+    <h1>Course administrator panel</h1>
+    <p class="sub">Change any setting below, then scroll down and click <strong>Generate config.js</strong>, then <strong>Download config.js</strong>. Upload that downloaded file to your website, replacing the old config.js — that one file is where every setting on this page actually lives. Nothing on this page saves by itself, and nothing here is sent anywhere; it all happens in your browser.</p>
+    <div class="callout note" style="margin-bottom:18px"><span class="co-label">What this site is currently running on</span>
+      <p style="font-size:.86rem">Settings file found: <strong>${loadedFrom}</strong><br>
+      Pass mark: <strong>${CONFIG.passThreshold}/${QUIZ.length}</strong> &middot; Must-watch video: <strong>${CONFIG.videoSkip?'off — learners can skip ahead':'on — learners must watch to the end'}</strong> &middot; Access unlock lasts: <strong>${CONFIG.accessDays} days</strong> &middot; Organisations set up: <strong>${CONFIG.orgs.map(o=>o.label).join(', ')||'none yet'}</strong></p>
+      <p style="font-size:.8rem;color:var(--ink-soft);margin-top:8px">Just uploaded a new config.js and still seeing old settings here? Your browser is showing a saved copy of the old page. Force it to check again: <strong>Ctrl/Cmd + Shift + R</strong>.</p>
     </div>
 
-    <fieldset><legend>Video</legend>
-      <div class="row2"><div><label>Video file</label><input type="text" data-k="videoSrc" value="${c.videoSrc}"></div><div><label>Captions file (.vtt)</label><input type="text" data-k="videoCaptions" value="${c.videoCaptions}"></div></div>
-      <label>Video screen title</label><input type="text" data-k="videoTitle" value="${c.videoTitle}">
-      <div class="toggle"><input type="checkbox" id="t-skip" data-k="videoSkip" ${c.videoSkip?'checked':''}><label for="t-skip">Allow video skipping (off = must watch to unlock)</label></div>
+    <fieldset><legend>Intro video</legend>
+      <div class="row2"><div><label>Video file name</label><input type="text" data-k="videoSrc" value="${c.videoSrc}"></div><div><label>Captions file name (.vtt)</label><input type="text" data-k="videoCaptions" value="${c.videoCaptions}"></div></div>
+      <p class="hintline">These are file names only — the actual video and caption files must be uploaded to the same folder as index.html, spelled exactly the same way (capital letters matter).</p>
+      <label>Title shown above the video</label><input type="text" data-k="videoTitle" value="${c.videoTitle}">
+      <div class="toggle"><input type="checkbox" id="t-skip" data-k="videoSkip" ${c.videoSkip?'checked':''}><label for="t-skip">Let learners skip or fast-forward the video</label></div>
+      <p class="hintline">Leave this OFF if you want every learner to watch the whole video before the course modules unlock (recommended). Turn it ON to let learners jump ahead freely.</p>
     </fieldset>
 
-    <fieldset><legend>Completion</legend>
-      <label>Pass mark \u2014 correct answers out of ${QUIZ.length} needed</label>
+    <fieldset><legend>Passing the course</legend>
+      <label>Correct answers needed, out of ${QUIZ.length} knowledge check questions</label>
       <input type="number" min="1" max="${QUIZ.length}" data-k="passThreshold" value="${c.passThreshold}">
-      <p class="hintline">The knowledge check has ${QUIZ.length} questions. Set how many must be correct to complete the course.</p>
+      <p class="hintline">A learner must get at least this many of the ${QUIZ.length} questions right to complete the course and unlock their certificate. Most awareness courses use a threshold below full marks (e.g. 8 out of 10) rather than requiring every answer correct.</p>
     </fieldset>
 
-    <fieldset><legend>Branding</legend>
-      <label>InclusionEdge logo file</label><input type="text" data-k="logoMain" value="${c.logoMain}">
-      <p class="hintline">Per-organisation logos are set in the Organisations table below.</p>
+    <fieldset><legend>Logos</legend>
+      <label>InclusionEdge logo — file name</label><input type="text" data-k="logoMain" value="${c.logoMain}">
+      <p class="hintline">This logo appears on every page and on every certificate, for every organisation. To add a logo for one specific client organisation, use the Logo file column in the Organisations table below — not here.</p>
     </fieldset>
 
-    <fieldset><legend>Reporting &amp; analytics</legend>
-      <label>Completion report CC (your compilation inbox)</label><input type="email" data-k="reportCC" value="${c.reportCC}">
-      <div class="row2"><div><label>GoatCounter site code</label><input type="text" data-k="goatcounter" value="${c.goatcounter}"></div><div><label>GoatCounter dashboard URL</label><input type="url" data-k="goatcounterUrl" value="${c.goatcounterUrl}"></div></div>
+    <fieldset><legend>Completion reports &amp; usage stats</legend>
+      <label>Also send every completion report to this email (optional)</label><input type="email" data-k="reportCC" value="${c.reportCC}">
+      <p class="hintline">When a learner finishes the course and clicks "Report completion", their email also gets copied here automatically — handy for keeping your own record without asking each client to forward it. Leave blank to turn this off.</p>
+      <div class="row2"><div><label>GoatCounter site code</label><input type="text" data-k="goatcounter" value="${c.goatcounter}"></div><div><label>GoatCounter dashboard link (optional)</label><input type="url" data-k="goatcounterUrl" value="${c.goatcounterUrl}"></div></div>
+      <p class="hintline">GoatCounter is an optional, privacy-friendly visit counter — it only counts anonymous page views, never names or answers. Leave the site code blank to turn this off completely. If you leave the dashboard link blank, this panel will work out the link for you from the site code.</p>
       <p class="hintline" id="gcLink"></p>
     </fieldset>
 
-    <fieldset><legend>Access</legend>
-      <div class="row2"><div><label>Access valid for (days)</label><input type="number" min="1" data-k="accessDays" value="${c.accessDays}"></div><div class="toggle" style="margin-top:34px"><input type="checkbox" id="t-name" data-k="nameMandatory" ${c.nameMandatory?'checked':''}><label for="t-name">Require name at entry</label></div></div>
-      <div class="toggle"><input type="checkbox" id="t-setcode" data-k="enableSetcode" ${c.enableSetcode?'checked':''}><label for="t-setcode">Enable #/setcode helper (keep OFF in client builds)</label></div>
+    <fieldset><legend>How learners get in</legend>
+      <div class="row2"><div><label>Days before a device needs the code again</label><input type="number" min="1" data-k="accessDays" value="${c.accessDays}"></div><div class="toggle" style="margin-top:34px"><input type="checkbox" id="t-name" data-k="nameMandatory" ${c.nameMandatory?'checked':''}><label for="t-name">Require a name before starting</label></div></div>
+      <p class="hintline">Once someone enters a valid access code on their phone or computer, that device stays unlocked for this many days without asking again. If "Require a name" is OFF, learners can still add their name later, at the certificate step.</p>
+      <div class="toggle"><input type="checkbox" id="t-setcode" data-k="enableSetcode" ${c.enableSetcode?'checked':''}><label for="t-setcode">Show the internal access-code helper page</label></div>
+      <p class="hintline">This is a developer tool for generating one-off access codes outside the table below. Leave this OFF for real deployments — it isn't needed for normal day-to-day use.</p>
     </fieldset>
 
-    <fieldset><legend>Organisations</legend>
-      <table class="org-tbl"><thead><tr><th>Organisation</th><th>Access code</th><th>HR email</th><th>Logo file</th><th></th></tr></thead><tbody id="orgBody"></tbody></table>
-      <button class="addrow" id="addOrg">+ Add organisation</button>
-      <p class="hintline">Type a plain access code \u2014 it is hashed automatically when you generate the config. Existing codes show as \u201c(set)\u201d; leave them to keep, or type a new code to replace.</p>
+    <fieldset><legend>Client organisations</legend>
+      <p class="hintline" style="margin-top:0">One row per client company taking this course. Each row needs its own access code (what their learners type to get in), an email address (where their completion reports go), and — optionally — their own logo file.</p>
+      <table class="org-tbl"><thead><tr><th>Organisation name</th><th>Access code</th><th>HR / reports email</th><th>Logo file (optional)</th><th></th></tr></thead><tbody id="orgBody"></tbody></table>
+      <button class="addrow" id="addOrg">+ Add another organisation</button>
+      <p class="hintline">Type a plain, memorable code such as <code>acme2026</code> — it gets scrambled automatically the moment you click Generate config.js below, so the plain code never sits in the file itself. A row already saved shows "(set — type to change)"; leave that as it is to keep the existing code, or type a new one to replace it. To stop an organisation's code from working, delete its row with the ✕ button.</p>
     </fieldset>
 
     <fieldset><legend>Security</legend>
-      <label>Admin password hash</label><input type="text" data-k="adminHash" value="${c.adminHash}">
-      <p class="hintline">Generate a new one at <code>#/adminsetup</code>. Changing this changes the password for this panel.</p>
+      <label>Admin password (scrambled code)</label><input type="text" data-k="adminHash" value="${c.adminHash}">
+      <p class="hintline">This box holds your admin password already scrambled — never type a plain password directly into this box. To set or change the actual password, go to <code>#/adminsetup</code>, type your new password there, and paste the code it gives you into this box.</p>
     </fieldset>
 
     <button class="btn" id="genCfg" style="width:100%;justify-content:center">Generate config.js</button>
+    <p class="hintline" style="text-align:center">This builds the updated settings file from everything above — it doesn't change your live site until you download it and upload it to your website.</p>
     <div class="cfg-out" id="cfgOut" style="display:none"></div>
     <div class="cert-actions" id="cfgActions" style="display:none;margin-top:12px">
       <button class="btn" id="dlCfg">Download config.js</button>
@@ -1549,10 +1338,10 @@ function viewGate(){
     <h1>Disability Awareness@Work</h1>
     <p class="sub">This course is for participating organisations. Enter your organisation\u2019s access code to begin.</p>
     <div class="gate-err" id="gateErr"></div>
-    <input id="nameInput" type="text" autocomplete="name" placeholder="Your name" aria-label="Your name" style="margin-bottom:12px">
+    <input id="nameInput" type="text" autocomplete="name" placeholder="${CONFIG.nameMandatory?'Your name':'Your name (optional — you can add it later)'}" aria-label="Your name" style="margin-bottom:12px">
     <input id="codeInput" type="password" autocomplete="off" placeholder="Access code" aria-label="Access code">
     <button class="btn" id="codeGo" style="width:100%;justify-content:center">Enter the course &rarr;</button>
-    <p class="gate-note">Enter your name as it should appear on your certificate (you can adjust it later). Your device stays unlocked for ${CONFIG.accessDays} days. <strong>Your name stays on this device and is used only for your certificate</strong> \u2014 the access check happens here, on your device, and nothing you type is sent anywhere.</p>
+    <p class="gate-note">${CONFIG.nameMandatory?'Enter your name as it should appear on your certificate (you can adjust it later).':'Your name is optional here \u2014 you\u2019ll be asked for it again, and can change it, at the certificate step.'} Your device stays unlocked for ${CONFIG.accessDays} days. <strong>Your name stays on this device and is used only for your certificate</strong> \u2014 the access check happens here, on your device, and nothing you type is sent anywhere.</p>
   </div>`);
   const nameF = v.querySelector('#nameInput'), input = v.querySelector('#codeInput'), err = v.querySelector('#gateErr');
   nameF.value = state.learnerName || '';
@@ -1561,7 +1350,7 @@ function viewGate(){
     const nm = (nameF.value||'').trim();
     const h = codeHash(input.value||'');
     const org = CONFIG.orgs.find(o=>o.hash===h);
-    if(!nm){ fail('Please enter your name to continue.'); nameF.focus(); return; }
+    if(CONFIG.nameMandatory && !nm){ fail('Please enter your name to continue.'); nameF.focus(); return; }
     if(!input.value || !org){ fail('That code isn\u2019t recognised. Please check with your HR team or programme administrator for your organisation\u2019s access code.'); input.value=''; input.focus(); return; }
     state.learnerName = nm;
     state.access = {codeHash:h, grantedAt:Date.now()}; save();
@@ -1578,14 +1367,14 @@ function viewGate(){
 
 function viewSetCode(){
   const v = el(`<div class="codegen">
-    <h1 style="color:var(--deep);font-size:1.6rem;margin-bottom:8px">Access code generator</h1>
-    <p class="sub" style="color:var(--ink-soft);margin-bottom:18px">Administrator utility. Type a new access code to generate its config line, then paste that line into the <strong>ACCESS_CODES</strong> list near the top of this file. Delete a line to revoke that organisation\u2019s access.</p>
-    <input id="genInput" type="text" autocomplete="off" placeholder="New access code" aria-label="New access code" style="width:100%;border:1.5px solid var(--line);border-radius:12px;padding:14px 16px;font-family:inherit;font-size:1rem;background:var(--card)">
-    <code id="genOut">Config line appears here\u2026</code>
+    <h1 style="color:var(--deep);font-size:1.6rem;margin-bottom:8px">Access code helper (internal tool)</h1>
+    <p class="sub" style="color:var(--ink-soft);margin-bottom:18px">This is a quick way to see what a scrambled access code looks like before it goes into config.js. For normal day-to-day use, add organisations through the <a href="#/admin">Admin panel</a>'s Organisations table instead — it does this same scrambling automatically and writes the whole file for you.</p>
+    <input id="genInput" type="text" autocomplete="off" placeholder="Type a plain access code to try" aria-label="New access code" style="width:100%;border:1.5px solid var(--line);border-radius:12px;padding:14px 16px;font-family:inherit;font-size:1rem;background:var(--card)">
+    <code id="genOut">The scrambled result will appear here&hellip;</code>
   </div>`);
   const inp = v.querySelector('#genInput'), out = v.querySelector('#genOut');
   inp.addEventListener('input',()=>{
-    out.textContent = inp.value.trim() ? `{ hash:'${codeHash(inp.value)}', label:'ORG NAME', email:'hr@example.com', logo:'' }, // code: ${inp.value.trim()} \u2014 fill in, then remove this comment` : 'Config line appears here\u2026';
+    out.textContent = inp.value.trim() ? `{ hash:'${codeHash(inp.value)}', label:'ORG NAME', email:'hr@example.com', logo:'' } — for code "${inp.value.trim()}". Fill in the organisation name and email, then add this line to the orgs list in config.js.` : 'The scrambled result will appear here\u2026';
   });
   return v;
 }
@@ -1596,14 +1385,14 @@ function viewCover(){
       <img src="${CONFIG.logoMain}" alt="InclusionEdge" onerror="this.style.display='none'">
       ${currentOrg().logo?`<img src="${currentOrg().logo}" alt="${currentOrg().label}" onerror="this.style.display='none'">`:''}
     </div>
-    <div class="eyebrow">Self-paced eLearning &middot; ~90 minutes &middot; Aligned to Enabling Masterplan 2030</div>
+    <div class="eyebrow">Self-paced eLearning &middot; ~${TOTAL_MINUTES} minutes &middot; Aligned to Enabling Masterplan 2030</div>
     <h1>Disability Awareness<span class="at">@</span><span class="accent">Work</span></h1>
     <div class="spectrum-band" role="img" aria-label="A spectrum band — the course motif, because disability exists on a spectrum"></div>
     <p class="sub"><strong>Disability awareness for the Singapore workplace</strong> — a foundation course for everyone, whatever the job and whatever the level. The Enabling Masterplan 2030 asks that by 2030, persons with disabilities are <em>equally recognised</em> at work. No scheme can deliver that. It happens in your team, or it does not happen at all.</p>
     <div class="meta-row">
-      <span class="meta-chip">5 modules</span>
-      <span class="meta-chip">3 case scenarios</span>
-      <span class="meta-chip">~90 minutes</span>
+      <span class="meta-chip">${MODULES.length} modules</span>
+      <span class="meta-chip">${SCENARIO_COUNT} case scenarios</span>
+      <span class="meta-chip">~${TOTAL_MINUTES} minutes</span>
       <span class="meta-chip">Certificate on completion</span>
     </div>
     <a class="btn" href="${state.videoDone?'#/menu':'#/video'}">Start the course &rarr;</a>
@@ -1617,12 +1406,12 @@ function viewCover(){
 
 function viewMenu(){
   if(!state.videoDone){ location.hash='#/video'; return viewVideo(); }
-  const v = el(`<div class="menu"><h1>Course modules</h1><p class="sub">About 90 minutes end to end. Your progress bar is the spectrum band at the very top of the page.</p><div class="mod-list"></div></div>`);
+  const v = el(`<div class="menu"><h1>Course modules</h1><p class="sub">About ${TOTAL_MINUTES} minutes end to end. Your progress bar is the spectrum band at the very top of the page.</p><div class="mod-list"></div></div>`);
   const list = v.querySelector('.mod-list');
   MODULES.forEach(m=>{
     const done = !!state.completed[m.id];
     list.appendChild(el(`<a class="mod-item" href="#/m/${m.num}">
-      <span class="mod-num" style="background:${TYPE_COLORS[m.id]}">${m.num}</span>
+      <span class="mod-num" style="background:${m.color}">${m.num}</span>
       <span class="mod-body"><h3>${m.title}</h3><p>${m.menuSub} &middot; ${m.time}</p></span>
       <span class="mod-state ${done?'done':'todo'}">${done?'&#10003; Done':'Open'}</span>
     </a>`));
@@ -1641,7 +1430,7 @@ function viewModule(num){
   if(!m) return viewMenu();
   const v = el(`<article>
     <div class="lesson-head">
-      <span class="modtag" style="background:${TYPE_COLORS[m.id]}">Module ${m.num} of 5</span>
+      <span class="modtag" style="background:${m.color}">Module ${m.num} of ${MODULES.length}</span>
       <h1>${m.title}</h1>
       <p class="lede">${m.lede}</p>
       <div class="timechip">&#9202; ${m.time}</div>
@@ -1654,14 +1443,14 @@ function viewModule(num){
   const foot = v.querySelector('.lesson-foot');
   const nextNum = Number(m.num)+1;
   foot.appendChild(el(`<a class="btn secondary small" href="#/menu">&larr; All modules</a>`));
-  if(m.id==='m5'){
+  if(m===FINAL_MODULE){
     foot.appendChild(m6Actions());
   } else {
     const doneBtn = el(`<button class="btn">${state.completed[m.id]?'&#10003; Completed':'Mark module complete'}</button>`);
     if(state.completed[m.id]) doneBtn.classList.add('secondary');
     doneBtn.addEventListener('click',()=>{
       state.completed[m.id]=true; save(); updateRibbon();
-      location.hash = nextNum<=5 ? '#/m/'+nextNum : '#/menu';
+      location.hash = nextNum<=MODULES.length ? '#/m/'+nextNum : '#/menu';
     });
     foot.appendChild(doneBtn);
   }
