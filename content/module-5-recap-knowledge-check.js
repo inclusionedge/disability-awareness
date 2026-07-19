@@ -37,10 +37,10 @@ window.DAW_CONTENT.push(
       {icon:'star', bg:'#F9E9E4', fg:'#C4553B', h:'Do not wait to be asked', p:'Speaking up is hard for anyone who fears being seen as difficult. Notice early. A barrier you spot is a barrier you can raise \u2014 without naming anyone.'}
     ]},
     {type:'callout', kind:'warm', label:'The line to remember', html:'<p><strong>You are not expected to solve this alone. You are expected to notice, to respond with respect, and to know who to call.</strong></p>'},
-    {type:'callout', kind:'note', label:'This was Level 0', html:'<p>This course is a foundation \u2014 awareness, not expertise. Deeper training exists for those who want it or need it in a specific role, including structured workshops on recruitment, workplace accommodation, assistive technology and supporting positive behaviour. Ask HR what is available.</p>'},
+    {type:'callout', kind:'note', label:'This was an introductory course', html:'<p>This course is a foundation \u2014 awareness, not expertise. Deeper training exists for those who want it or need it in a specific role, including structured workshops on recruitment, workplace accommodation, assistive technology and supporting positive behaviour. Ask HR what is available.</p>'},
 
     {type:'h2', text:'Knowledge check'},
-    {type:'html', node:()=>el(`<div class="block"><p>${QUIZ.length} questions covering everything in this course. Instant feedback on each. <strong>${passMark()} out of ${QUIZ.length} correct is required to complete the course</strong> \u2014 not because this is an exam, but because every one of these moments matters to a real colleague. Retake as often as you like; the answer options are reshuffled each time. Your answers and score stay on this device.</p></div>`)},
+    {type:'html', node:()=>el(`<div class="block"><p>${shownQuizLength()} questions covering the key ideas in this course. Instant feedback on each. <strong>${passMark()} out of ${shownQuizLength()} correct is required to complete the course</strong> \u2014 not because this is an exam, but because every one of these moments matters to a real colleague. Retake as often as you like; the answer options are reshuffled each time. Your answers and score stay on this device.</p></div>`)},
     {type:'quiz'},
     {type:'confidence', slot:'confidenceEnd', q:'Now \u2014 how confident do you feel interacting with and supporting a colleague with a disability?', compare:true},
     {type:'h2', text:'Your commitment'},
@@ -53,7 +53,7 @@ window.DAW_CONTENT.push(
         const lines = ['DISABILITY AWARENESS@WORK \u2014 MY REFLECTIONS','Generated '+new Date().toLocaleString(),''];
         if(state.confidenceStart) lines.push('Confidence at start: '+state.confidenceStart+'/5');
         if(state.confidenceEnd) lines.push('Confidence at end:   '+state.confidenceEnd+'/5');
-        if(state.quizScore!==null) lines.push('Best quiz score:     '+state.quizScore+'/'+QUIZ.length);
+        if(state.quizScore!==null) lines.push('Best quiz score:     '+state.quizScore+'/'+shownQuizLength());
         lines.push('');
         Object.values(state.reflections).forEach(r=>{ if(r.a&&r.a.trim()){ lines.push('Q: '+r.q,'A: '+r.a.trim(),''); }});
         if(lines.length<8) lines.push('(No written reflections yet \u2014 go back and jot a few!)');
@@ -63,36 +63,7 @@ window.DAW_CONTENT.push(
         URL.revokeObjectURL(a.href);
       });
       return w;
-    }},
-
-    /* ==========================================================
-       BETA v01 — FEATURE PREVIEW (remove this whole section before
-       real learners see this course). It sits after the certificate
-       gate on purpose, so it never affects completion or scoring.
-       Every block here reuses facts already stated and approved
-       earlier in this course — nothing new is being claimed, this
-       is only to let you click-test each new widget once deployed.
-       ========================================================== */
-    {type:'h2', text:'BETA v01 \u2014 feature preview (delete before production)'},
-    {type:'callout', kind:'warm', label:'For John, not learners', html:'<p>Everything below tests the new block types added in this build: select-all quick checks, images, video, tabs and a carousel. Nothing here affects the quiz score or certificate. Delete this whole section from <code>content/module-5-recap-knowledge-check.js</code> once you\u2019re happy each one works \u2014 search for \u201cBETA v01\u201d.</p>'},
-
-    {type:'checkbox', q:'[Preview] Which of these are among the four broad disability types recognised in Singapore? Select all that apply.', options:['Physical disability','Chronic illness','Sensory impairment (hearing and vision)','Intellectual disability','Autism'], answer:[0,2,3,4], why:'Chronic illness is a related but separate area from the four types this course covers \u2014 see Module 2. This question just re-checks that fact through the new select-all widget.'},
-
-    {type:'image', src:'content/images/example-photo.jpg', alt:'Placeholder \u2014 replace with a real photo, e.g. colleagues at a shift huddle', caption:'[Preview] This is the image block. Replace the src with a real file (e.g. content/images/your-photo.jpg) once you have one \u2014 until then it will show the "image not found" message below, which is expected.'},
-
-    {type:'video', src:'content/videos/example-clip.mp4', captions:'', caption:'[Preview] This is the module-level video block (separate from the intro gate video). Replace the src with a real file once you have one \u2014 it will show a "video not found" message until then, which is expected.'},
-
-    {type:'tabs', tabs:[
-      {label:'Ask', html:'<p>[Preview \u2014 tabs widget] A colleague is the expert on what works. Ask privately, respectfully, about the work \u2014 then listen to the actual answer.</p>'},
-      {label:'Listen', html:'<p>[Preview \u2014 tabs widget] Person-first language by default. If a colleague states a different preference, follow it without debate.</p>'},
-      {label:'Adjust', html:'<p>[Preview \u2014 tabs widget] Offer, wait, then ask how. \u201cNo thanks\u201d is a complete answer. Help given without consent is not help.</p>'}
-    ]},
-
-    {type:'carousel', label:'Feature preview slides', slides:[
-      {tag:'1 of 3', h:'Ask the person', html:'<p>[Preview \u2014 carousel widget] A colleague is the expert on what works for them. Ask privately and respectfully.</p>'},
-      {tag:'2 of 3', h:'Think before you speak', html:'<p>[Preview \u2014 carousel widget] Person-first language by default \u2014 unless a colleague has stated their own preference.</p>'},
-      {tag:'3 of 3', h:'Avoid assumptions', html:'<p>[Preview \u2014 carousel widget] The disability type tells you where to start asking. It never tells you what someone cannot do.</p>'}
-    ]}
+    }}
   ]
 }
 );

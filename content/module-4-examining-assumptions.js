@@ -42,11 +42,11 @@ window.DAW_CONTENT.push(
     ]},
 
     {type:'h2', text:'The kindness traps'},
-    {type:'text', html:'<p>Three habits that feel generous, and are not. All three are most common among people who are \u2014 correctly \u2014 considered supportive colleagues.</p>'},
-    {type:'tiles', items:[
-      {icon:'shield', bg:'#EDE9F7', fg:'#6B5CA5', h:'Over-helping', p:'Doing what a colleague can do perfectly well alone. Every time a task is taken over, the message received is: I did not think you could. Offer, wait, and let the answer be no.'},
-      {icon:'star', bg:'#EDE9F7', fg:'#6B5CA5', h:'The inspiration trap', p:'\u201cSo inspiring, just for showing up!\u201d Treating ordinary competence as heroism marks a colleague as fundamentally different \u2014 and quietly lowers the bar being set.'},
-      {icon:'chat', bg:'#EDE9F7', fg:'#6B5CA5', h:'The silent cover-up', p:'Quietly redoing a colleague\u2019s work, or never mentioning a mistake. It feels gentle. It communicates: I expect nothing of you, and I do not see you growing here.'}
+    {type:'text', html:'<p>Three habits that feel generous, and are not. All three are most common among people who are \u2014 correctly \u2014 considered supportive colleagues. Read one at a time \u2014 use the arrow buttons, or your left/right arrow keys.</p>'},
+    {type:'carousel', label:'The three kindness traps', larger:true, slides:[
+      {tag:'Trap 1 of 3', h:'Over-helping', html:'<p>Doing what a colleague can do perfectly well alone. Every time a task is taken over, the message received is: <em>I did not think you could.</em></p><p><strong>Instead:</strong> offer, wait, and let the answer be no.</p>'},
+      {tag:'Trap 2 of 3', h:'The inspiration trap', html:'<p>\u201cSo inspiring, just for showing up!\u201d Treating ordinary competence as heroism marks a colleague as fundamentally different \u2014 and quietly lowers the bar being set.</p><p><strong>Instead:</strong> give the same feedback, the same recognition, and the same stretch you would give anyone else.</p>'},
+      {tag:'Trap 3 of 3', h:'The silent cover-up', html:'<p>Quietly redoing a colleague\u2019s work, or never mentioning a mistake. It feels gentle. It communicates: <em>I expect nothing of you, and I do not see you growing here.</em></p><p><strong>Instead:</strong> name the mistake as you would with any colleague \u2014 privately, specifically, and paired with what to do differently next time.</p>'}
     ]},
 
     {type:'h2', text:'The case: something has changed'},

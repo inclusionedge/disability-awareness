@@ -62,6 +62,11 @@ header.appbar{
 .appbar nav{display:flex;gap:8px;align-items:center}
 .navbtn{background:none;border:1px solid var(--line);border-radius:99px;padding:6px 14px;font-size:.85rem;font-weight:700;color:var(--deep);text-decoration:none;background:var(--card)}
 .navbtn:hover{border-color:var(--teal)}
+.orgbadge{display:flex;align-items:center;gap:8px;padding:5px 12px;border-radius:99px;background:var(--card);border:1px solid var(--line);font-size:.8rem;font-weight:700;color:var(--ink-soft);max-width:36%;overflow:hidden}
+.orgbadge img{height:22px;width:auto;object-fit:contain}
+.orgbadge .orgbadge-label{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.orgbadge .orgbadge-prefix{color:var(--ink-soft);font-weight:500;font-size:.7rem;letter-spacing:.06em;text-transform:uppercase}
+@media (max-width:640px){ .orgbadge .orgbadge-label{max-width:110px} .orgbadge .orgbadge-prefix{display:none} }
 
 main{max-width:var(--maxw);margin:0 auto;padding:34px 20px 90px}
 
@@ -84,6 +89,33 @@ main{max-width:var(--maxw);margin:0 auto;padding:34px 20px 90px}
 .btn.secondary{background:var(--card);color:var(--deep);border:1.5px solid var(--line)}
 .btn.secondary:hover{background:var(--mist);border-color:var(--teal)}
 .btn.small{padding:9px 16px;font-size:.9rem;border-radius:10px}
+.btn.danger{background:var(--coral);color:#fff}
+.btn.danger:hover{background:#A13E28}
+.btn.ghost{background:transparent;color:var(--ink-soft);border:1.5px solid var(--line);box-shadow:none}
+.btn.ghost:hover{background:var(--mist);color:var(--deep)}
+
+/* in-app dialog — used for the reset-progress confirm, request-access dialog, etc. */
+.dlg-backdrop{position:fixed;inset:0;background:rgba(15,53,104,.55);display:flex;align-items:center;justify-content:center;padding:22px;z-index:9000;animation:dlgFadeIn .18s ease}
+@keyframes dlgFadeIn{from{opacity:0}to{opacity:1}}
+.dlg{background:var(--card);border-radius:var(--radius);box-shadow:0 24px 60px rgba(15,53,104,.28);max-width:520px;width:100%;padding:26px 28px 22px;position:relative;animation:dlgSlideUp .22s ease}
+@keyframes dlgSlideUp{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
+.dlg h2{color:var(--deep);font-size:1.35rem;margin-bottom:8px}
+.dlg .dlg-lede{color:var(--ink-soft);margin-bottom:16px;font-size:.95rem;line-height:1.55}
+.dlg .dlg-body label{display:block;font-weight:700;color:var(--deep);margin:14px 0 6px;font-size:.9rem}
+.dlg .dlg-body input,.dlg .dlg-body textarea{width:100%;border:1.5px solid var(--line);border-radius:10px;padding:11px 14px;font-family:inherit;font-size:.98rem;background:var(--card);color:var(--ink)}
+.dlg .dlg-body textarea{min-height:110px;resize:vertical}
+.dlg .dlg-err{background:var(--coral-soft);border:1px solid var(--coral);color:#8B2E1B;border-radius:10px;padding:10px 14px;margin:12px 0;font-size:.9rem;display:none}
+.dlg .dlg-err.show{display:block}
+.dlg .dlg-hint{font-size:.82rem;color:var(--ink-soft);margin-top:10px;line-height:1.5}
+.dlg .dlg-actions{display:flex;justify-content:flex-end;gap:10px;margin-top:22px;flex-wrap:wrap}
+.dlg.caution{border-top:5px solid var(--coral)}
+.dlg.caution h2{color:var(--coral)}
+.dlg .dlg-close{position:absolute;top:12px;right:12px;background:transparent;border:none;font-size:1.6rem;line-height:1;color:var(--ink-soft);cursor:pointer;padding:6px 10px;border-radius:8px}
+.dlg .dlg-close:hover{background:var(--mist);color:var(--deep)}
+
+/* reset button in the footer — caution-tinted so it's clearly a destructive action */
+#resetProgress{background:transparent;border:1.5px solid var(--coral);border-radius:99px;padding:6px 16px;font-size:.8rem;color:var(--coral);font-weight:800;cursor:pointer;letter-spacing:.02em}
+#resetProgress:hover{background:var(--coral-soft)}
 .audience{margin-top:44px;display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:14px}
 .aud-card{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);padding:18px 18px 16px;box-shadow:var(--shadow)}
 .aud-card h3{font-size:1rem;margin-bottom:5px;color:var(--deep)}
@@ -153,6 +185,10 @@ main{max-width:var(--maxw);margin:0 auto;padding:34px 20px 90px}
 /* carousel (future block type) */
 .carousel{margin:22px 0}
 .carousel-stage{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);padding:22px;box-shadow:var(--shadow);min-height:120px}
+.carousel.larger .carousel-stage{padding:36px 32px;min-height:220px;font-size:1.15rem;line-height:1.65}
+.carousel.larger .carousel-stage h4{font-size:1.9rem;margin-bottom:14px;line-height:1.2}
+.carousel.larger .carousel-stage p{margin-bottom:14px}
+.carousel.larger .carousel-tag{font-size:.9rem;padding:4px 12px}
 .carousel-tag{display:inline-block;background:var(--deep);color:#fff;font-weight:800;font-size:.76rem;letter-spacing:.08em;border-radius:99px;padding:4px 14px;margin-bottom:12px}
 .carousel-stage h4{font-size:1.15rem;color:var(--deep);margin-bottom:8px}
 .carousel-nav{display:flex;align-items:center;justify-content:center;gap:14px;margin-top:16px}
@@ -403,6 +439,7 @@ footer.site .band{height:6px;border-radius:99px;background:var(--spectrum);margi
       </span>
       Disability Awareness@Work
     </a>
+    <div class="orgbadge" id="orgBadge" hidden aria-hidden="true"></div>
     <nav aria-label="Course navigation">
       <a class="navbtn hide-sm" href="#/">Cover</a>
       <a class="navbtn" href="#/video">Intro video</a>
@@ -413,7 +450,7 @@ footer.site .band{height:6px;border-radius:99px;background:var(--spectrum);margi
 <main id="app" tabindex="-1"></main>
 <footer class="site">
   <div class="band"></div>
-  <p style="margin-bottom:10px"><button id="resetProgress" style="background:none;border:1px solid var(--line);border-radius:99px;padding:5px 14px;font-size:.78rem;color:var(--ink-soft);font-weight:700">Reset my progress</button></p>
+  <p style="margin-bottom:10px"><button id="resetProgress" title="Erase all your progress on this device">&#9888; Reset my progress</button></p>
   <p>&copy; InclusionEdge &middot; <strong>Disability Awareness@Work</strong> &middot; aligned to Singapore&rsquo;s Enabling Masterplan 2030. Your progress, reflections and name stay on your device; where usage counting is enabled, only anonymous page-view counts are collected (no cookies, no personal data). Set in Atkinson Hyperlegible, a typeface designed for readers with low vision &mdash; inclusive design, by default.</p>
 </footer>
 <script>
@@ -464,14 +501,18 @@ const DEFAULT_CONFIG = {
   videoSrc: 'intro.mp4',
   videoTitle: 'A message before you begin',
   videoCaptions: 'intro.vtt',
-  videoSkip: false,              // false = must watch to unlock (soft seek-lock); true = free scrubbing
+  videoSkip: false,              // false = must watch to unlock (soft seek-lock); true = allow skipping
   logoMain: 'inclusionedge.png', // InclusionEdge logo beside this file; '' for none
-  reportCC: '',                  // CC'd on every completion report; '' to disable
+  reportCC: '',                  // CC'd on every completion report; '' to disable (no cc parameter emitted)
+  requestCodeEmail: '',          // where "request an access code" enquiries go; '' falls back to reportCC
+  allowCertDownload: true,       // show the "Download certificate" button on the certificate page
+  allowReportCompletion: true,   // show the "Report completion" button on the certificate page
+  quizShowCount: 0,              // 0 or unset = show every question in the bank; otherwise sample this many
   goatcounter: '',               // your GoatCounter site code; '' disables counting
   goatcounterUrl: '',            // full dashboard URL for the admin panel link; '' if none
   accessDays: 30,                // days before a device must re-enter its code
   nameMandatory: true,           // require a name at the entry gate
-  passThreshold: 10,             // correct answers (out of QUIZ length) needed to complete
+  passThreshold: 10,             // correct answers (out of the shown question count) needed to complete
   enableSetcode: false,          // show the #/setcode helper (keep false in client builds)
   adminHash: '',                 // hashed admin password for #/admin; set via #/adminsetup
   orgs: [
@@ -574,6 +615,56 @@ const ICONS = {
 /* ---------- helpers ---------- */
 const el = (html) => { const t=document.createElement('template'); t.innerHTML=html.trim(); return t.content.firstElementChild; };
 function esc(s){return s.replace(/&/g,'&amp;').replace(/</g,'&lt;');}
+
+/* ==========================================================
+   openDialog(opts) — a reusable modal, so we never fall back
+   on the browser's native confirm() or prompt() (which look
+   nothing like the rest of the course). Used by the reset-
+   progress warning and the request-access-code form.
+
+   opts: { title, lede, bodyHTML?, caution?, actions:[{label, kind?, onClick(dlg)}] }
+   Returns the backdrop element (dlg.close() removes it).
+   ========================================================== */
+function openDialog(opts){
+  const caution = opts.caution ? ' caution' : '';
+  const back = el(`<div class="dlg-backdrop" role="dialog" aria-modal="true" aria-labelledby="dlgTitle">
+    <div class="dlg${caution}">
+      <button class="dlg-close" aria-label="Close dialog">&times;</button>
+      <h2 id="dlgTitle">${opts.title}</h2>
+      ${opts.lede?`<p class="dlg-lede">${opts.lede}</p>`:''}
+      <div class="dlg-body">${opts.bodyHTML||''}</div>
+      <div class="dlg-err" role="alert"></div>
+      <div class="dlg-actions"></div>
+    </div>
+  </div>`);
+  const dlg = back.querySelector('.dlg');
+  const acts = back.querySelector('.dlg-actions');
+  const err = back.querySelector('.dlg-err');
+  function close(){ back.remove(); document.removeEventListener('keydown', onKey); if(previouslyFocused && previouslyFocused.focus) previouslyFocused.focus(); }
+  const api = { close, showError(msg){ err.textContent = msg; err.classList.add('show'); }, clearError(){ err.classList.remove('show'); err.textContent=''; }, root: back };
+  (opts.actions||[]).forEach(a=>{
+    const b = el(`<button class="btn small ${a.kind==='danger'?'danger':(a.kind==='ghost'?'ghost':(a.kind==='secondary'?'secondary':''))}">${a.label}</button>`);
+    b.addEventListener('click',()=> a.onClick(api));
+    acts.appendChild(b);
+  });
+  back.querySelector('.dlg-close').addEventListener('click', close);
+  back.addEventListener('click', e=>{ if(e.target===back) close(); });
+  const previouslyFocused = document.activeElement;
+  function onKey(e){
+    if(e.key==='Escape'){ e.preventDefault(); close(); }
+    else if(e.key==='Tab'){
+      const focusable = [...dlg.querySelectorAll('button, input, textarea, select, a[href]')].filter(x=>!x.disabled);
+      if(focusable.length===0) return;
+      const first = focusable[0], last = focusable[focusable.length-1];
+      if(e.shiftKey && document.activeElement===first){ e.preventDefault(); last.focus(); }
+      else if(!e.shiftKey && document.activeElement===last){ e.preventDefault(); first.focus(); }
+    }
+  }
+  document.addEventListener('keydown', onKey);
+  document.body.appendChild(back);
+  setTimeout(()=>{ const focusEl = dlg.querySelector('input, textarea') || dlg.querySelector('.dlg-actions button'); if(focusEl) focusEl.focus(); }, 30);
+  return api;
+}
 function updateRibbon(){
   const done = Object.keys(state.completed).length;
   document.getElementById('ribbonFill').style.width = (done/(MODULES.length||1)*100)+'%';
@@ -625,7 +716,7 @@ const R = {
   },
 
   carousel: b => {
-    const wrap = el(`<div class="block"><div class="carousel" tabindex="0" role="group" aria-roledescription="carousel" aria-label="${esc(b.label||'Slides')} — use the arrow buttons or your left/right arrow keys">
+    const wrap = el(`<div class="block"><div class="carousel${b.larger?' larger':''}" tabindex="0" role="group" aria-roledescription="carousel" aria-label="${esc(b.label||'Slides')} — use the arrow buttons or your left/right arrow keys">
       <div class="carousel-stage" aria-live="polite"></div>
       <div class="carousel-nav"><button class="c-prev" aria-label="Previous slide">&#8249;</button><div class="carousel-dots" aria-hidden="true"></div><button class="c-next" aria-label="Next slide">&#8250;</button></div>
     </div></div>`);
@@ -906,13 +997,67 @@ function renderDial(score, total, pass){
   return wrap;
 }
 
+/* Entry #12: stratified sampling. Sample N questions from the bank, drawn
+   proportionally across their learning-outcome (lo) groups so no LO gets
+   silently dropped when N is small. Returns the whole bank unchanged
+   whenever the config value is 0, unset, or >= the bank size — so this
+   course, which shows all 10 by default, is bit-for-bit identical to
+   the un-sampled build. Deterministic per-attempt: the calling code
+   caches the sample so retakes see the same subset until reshuffled. */
+function stratifiedSample(bank, n){
+  n = Math.max(0, Math.min(n|0, bank.length));
+  if(!n || n>=bank.length) return bank.slice();
+  const groups = {}, groupOrder = [];
+  bank.forEach(q=>{
+    const key = q.lo || 'General';
+    if(!groups[key]){ groups[key] = []; groupOrder.push(key); }
+    groups[key].push(q);
+  });
+  /* Shuffle within each group */
+  groupOrder.forEach(k => groups[k].sort(()=>Math.random()-0.5));
+  /* Largest-remainder allocation across groups, so proportions are honoured
+     and every LO gets at least one seat as long as N >= number of LOs */
+  const total = bank.length;
+  const alloc = groupOrder.map(k=>({ k, exact: (groups[k].length * n) / total }));
+  const base = alloc.map(a=>({ k:a.k, take: Math.floor(a.exact), rem: a.exact - Math.floor(a.exact) }));
+  let assigned = base.reduce((s,a)=>s+a.take, 0);
+  /* Guarantee every group has at least one seat first (when possible) */
+  if(assigned < n){
+    base.filter(a=>a.take===0).sort((a,b)=>b.rem-a.rem).forEach(a=>{
+      if(assigned < n){ a.take = 1; assigned++; }
+    });
+  }
+  /* Distribute remaining seats by highest remainder */
+  base.sort((a,b)=>b.rem-a.rem);
+  let i = 0;
+  while(assigned < n){ base[i%base.length].take++; assigned++; i++; }
+  /* Cap any group to what it actually has */
+  base.forEach(a=>{ if(a.take > groups[a.k].length) a.take = groups[a.k].length; });
+  /* If capping stole seats, redistribute to under-filled groups */
+  assigned = base.reduce((s,a)=>s+a.take,0);
+  while(assigned < n){
+    const spare = base.find(a=>a.take < groups[a.k].length);
+    if(!spare) break;
+    spare.take++; assigned++;
+  }
+  /* Collect chosen items in original bank order for a consistent read */
+  const picked = new Set();
+  base.forEach(a=>{ groups[a.k].slice(0, a.take).forEach(q=>picked.add(q)); });
+  return bank.filter(q=>picked.has(q));
+}
+
 R.quiz = () => {
   const wrap = el('<div class="block" id="quizWrap"></div>');
-  function build(){
+  /* cache the sample so a retake shows the same question set until we
+     deliberately reshuffle it (fresh sample only on true reset) */
+  let currentSample = stratifiedSample(QUIZ, CONFIG.quizShowCount||0);
+  function build(reshuffle){
+    if(reshuffle) currentSample = stratifiedSample(QUIZ, CONFIG.quizShowCount||0);
+    const shown = currentSample;
     wrap.innerHTML = '';
     let answered = 0, correct = 0;
     const scoreCard = el('<div class="score-card" role="status" aria-live="polite" tabindex="-1" style="display:none"><div class="dial-holder"></div><p class="verdict-line" style="margin-top:6px"></p><div class="cert-actions" style="justify-content:center;margin-top:16px"></div></div>');
-    QUIZ.forEach((qz,idx)=>{
+    shown.forEach((qz,idx)=>{
       /* shuffle option order on every (re)build */
       const order = qz.options.map((_,i)=>i).sort(()=>Math.random()-0.5);
       const shuffled = order.map(i=>qz.options[i]);
@@ -920,21 +1065,21 @@ R.quiz = () => {
       wrap.appendChild(R.mcq({q:`<span style="color:var(--ink-soft);font-size:.8rem;font-weight:700">Q${idx+1} \u00B7 ${qz.lo}</span><br>${qz.q}`, options:shuffled, answer:shuffledAnswer, why:qz.why,
         onAnswer:(ok)=>{
           answered++; if(ok) correct++;
-          if(answered===QUIZ.length){
+          if(answered===shown.length){
             state.quizScore = Math.max(state.quizScore||0, correct); save();
             scoreCard.style.display='block';
             scoreCard.querySelector('.dial-holder').innerHTML='';
-            scoreCard.querySelector('.dial-holder').appendChild(renderDial(correct, QUIZ.length, passMark()));
+            scoreCard.querySelector('.dial-holder').appendChild(renderDial(correct, shown.length, passMark()));
             const line = scoreCard.querySelector('.verdict-line');
             const actions = scoreCard.querySelector('.cert-actions');
             actions.innerHTML='';
             if(correct>=passMark()){
-              line.innerHTML = '&#127881; <strong>Congratulations — you passed!</strong> You scored '+correct+' / '+QUIZ.length+' (pass mark '+passMark()+'). The completion requirement is met.<br><span style="font-size:.92rem;color:var(--ink-soft)">Continue below to the self-check and your commitment, then complete the course at the bottom of the page.</span>';
+              line.innerHTML = '&#127881; <strong>Congratulations \u2014 you passed!</strong> You scored '+correct+' / '+shown.length+' (pass mark '+passMark()+'). The completion requirement is met.<br><span style="font-size:.92rem;color:var(--ink-soft)">Continue below to the self-check and your commitment, then complete the course at the bottom of the page.</span>';
             } else {
-              line.innerHTML = '<strong>Almost there.</strong> You scored '+correct+' / '+QUIZ.length+'. Completing this course requires at least '+passMark()+' / '+QUIZ.length+' — review the feedback under each question, then try again. Answer options are reshuffled each attempt.';
+              line.innerHTML = '<strong>Almost there.</strong> You scored '+correct+' / '+shown.length+'. Completing this course requires at least '+passMark()+' / '+shown.length+' \u2014 review the feedback under each question, then try again. Answer options are reshuffled each attempt.';
               const retry = el('<button class="btn">Retake the quiz &#8634;</button>');
               retry.addEventListener('click',()=>{
-                build();
+                build(false); /* same question set, but reshuffled option order */
                 const first = wrap.querySelector('.mcq');
                 if(first && first.scrollIntoView) first.scrollIntoView({behavior:'smooth',block:'start'});
               });
@@ -949,19 +1094,22 @@ R.quiz = () => {
     });
     wrap.appendChild(scoreCard);
     window.__resetQuiz = (reset)=>{
-      if(reset) build();
+      if(reset) build(true);
       const f = wrap.querySelector('.mcq');
       if(f && f.scrollIntoView) f.scrollIntoView({behavior:'smooth',block:'start'});
     };
   }
-  build();
+  build(false);
   return wrap;
 };
+
+/* how many questions are actually shown in this configuration */
+function shownQuizLength(){ const n = CONFIG.quizShowCount|0; return (!n || n>=QUIZ.length) ? QUIZ.length : n; }
 
 /* ---------- views ---------- */
 /* ---------- completion & certificate helpers ---------- */
 function allModulesDone(){ return MODULES.every(m=>state.completed[m.id]); }
-function passMark(){ return Math.min((CONFIG.passThreshold|0)||QUIZ.length, QUIZ.length); }
+function passMark(){ return Math.min((CONFIG.passThreshold|0)||shownQuizLength(), shownQuizLength()); }
 function certEligible(){ return allModulesDone() && (state.quizScore||0) >= passMark(); }
 
 function m5GateNode(){
@@ -973,7 +1121,7 @@ function m5GateNode(){
     <span class="co-label">Course completion status</span>
     <ul class="cert-reqs">
       <li><span class="req-dot ${prevDone?'met':'unmet'}">${prevDone?'&#10003;':'!'}</span> ${priorLabel} marked complete ${prevDone?'':' — <em>check the module list</em>'}</li>
-      <li><span class="req-dot ${full?'met':'unmet'}">${full?'&#10003;':'!'}</span> Knowledge check passed (at least ${passMark()} of ${QUIZ.length}) ${full?'':(state.quizScore!==null?` — <em>best so far: ${state.quizScore}/${QUIZ.length}. Retake above.</em>`:' — <em>take the quiz above</em>')}</li>
+      <li><span class="req-dot ${full?'met':'unmet'}">${full?'&#10003;':'!'}</span> Knowledge check passed (at least ${passMark()} of ${shownQuizLength()}) ${full?'':(state.quizScore!==null?` &mdash; <em>best so far: ${state.quizScore}/${shownQuizLength()}. Retake above.</em>`:' &mdash; <em>take the quiz above</em>')}</li>
     </ul>
     ${certEligible()?'<p><a class="btn small" href="#/cert">Claim your certificate &rarr;</a></p>': (prevDone&&full ? '<p>Both requirements met — click <strong>Complete the course</strong> in your quiz results above.</p>' : '<p>Meet both requirements, then mark this module complete to unlock your downloadable certificate.</p>')}
   </div>`);
@@ -983,8 +1131,9 @@ function m5GateNode(){
 function m6Actions(){
   const box = el('<div id="m6actions" style="display:flex;gap:12px;align-items:center;flex-wrap:wrap;justify-content:flex-end"></div>');
   const best = state.quizScore;
+  const shown = shownQuizLength();
   if((best||0)>=passMark()){
-    box.appendChild(el('<span class="score-flag pass">Passed: '+best+' / '+QUIZ.length+' &#10003;</span>'));
+    box.appendChild(el('<span class="score-flag pass">Passed: '+best+' / '+shown+' &#10003;</span>'));
     const fin = el(`<button class="btn">${state.completed[FINAL_MODULE.id]?'View certificate &rarr;':'Complete the course &rarr;'}</button>`);
     fin.addEventListener('click',()=>{
       state.completed[FINAL_MODULE.id]=true; save(); updateRibbon();
@@ -992,7 +1141,7 @@ function m6Actions(){
     });
     box.appendChild(fin);
   } else {
-    box.appendChild(el(`<span class="score-flag">${best==null?'Quiz not attempted yet':'Your best score: '+best+' / '+QUIZ.length} &nbsp;&middot;&nbsp; ${passMark()}/${QUIZ.length} needed</span>`));
+    box.appendChild(el(`<span class="score-flag">${best==null?'Quiz not attempted yet':'Your best score: '+best+' / '+shown} &nbsp;&middot;&nbsp; ${passMark()}/${shown} needed</span>`));
     const retry = el(`<button class="btn">${best==null?'Take the quiz &#8593;':'Try the quiz again &#8634;'}</button>`);
     retry.addEventListener('click',()=>{ if(window.__resetQuiz) window.__resetQuiz(best!=null); });
     box.appendChild(retry);
@@ -1001,14 +1150,21 @@ function m6Actions(){
 }
 
 function viewVideo(){
+  const canSkip = !!CONFIG.videoSkip;
+  const subLine = state.videoDone
+    ? 'You\u2019ve already unlocked the modules \u2014 rewatch freely anytime, and scrub wherever you like.'
+    : canSkip
+      ? 'Watch this short video (about 5 minutes), or skip ahead to the modules using the button below the video.'
+      : 'Watch this short video to the end to unlock the course modules (about 5 minutes). You can pause anytime \u2014 your furthest point is remembered on this device.';
   const v = el(`<div class="videogate">
     <div class="eyebrow">Step 1 of 2 &middot; Before the modules</div>
     <h1>${CONFIG.videoTitle}</h1>
-    <p class="sub">${state.videoDone?'You\u2019ve already unlocked the modules — rewatch freely anytime, and scrub wherever you like.':'Watch this short video to the end to unlock the course modules (about 5 minutes). You can pause anytime — your furthest point is remembered on this device.'}</p>
+    <p class="sub">${subLine}</p>
     <div class="videobox"><video controls preload="metadata" playsinline><source src="${CONFIG.videoSrc}" type="video/mp4"><track kind="captions" src="${CONFIG.videoCaptions}" srclang="en" label="English"></video></div>
     <div class="gate-status">
-      <span class="gate-pill ${state.videoDone?'open':'locked'}" id="gatePill">${state.videoDone?'&#10003; Video watched — modules unlocked':'&#128274; Modules unlock when the video ends'}</span>
+      <span class="gate-pill ${state.videoDone?'open':'locked'}" id="gatePill">${state.videoDone?'&#10003; Video watched \u2014 modules unlocked':(canSkip?'Watch, or skip to the modules':'&#128274; Modules unlock when the video ends')}</span>
       <a class="btn small" id="gateGo" href="#/menu" style="${state.videoDone?'':'display:none'}">Go to modules &rarr;</a>
+      ${(canSkip && !state.videoDone)?'<button class="btn small secondary" id="gateSkip">Skip video &rarr;</button>':''}
     </div>
     <div class="gate-fallback" id="gateFallback">
       <div class="callout warm"><span class="co-label">Video unavailable</span>
@@ -1021,13 +1177,14 @@ function viewVideo(){
   const go = v.querySelector('#gateGo');
   let seekGuard = false;
   video.addEventListener('loadedmetadata',()=>{
-    if(!state.videoDone && state.videoMax>0 && state.videoMax < video.duration - 1) video.currentTime = state.videoMax;
+    if(!state.videoDone && !canSkip && state.videoMax>0 && state.videoMax < video.duration - 1) video.currentTime = state.videoMax;
   });
   video.addEventListener('timeupdate',()=>{
     if(seekGuard) return;
-    if(!state.videoDone && video.currentTime > state.videoMax + 2){
+    /* soft seek-lock only applies when skipping isn't allowed */
+    if(!state.videoDone && !canSkip && video.currentTime > state.videoMax + 2){
       seekGuard = true; video.currentTime = state.videoMax; seekGuard = false;
-      pill.textContent = 'No skipping ahead — jumped back to your furthest point';
+      pill.textContent = 'No skipping ahead \u2014 jumped back to your furthest point';
       setTimeout(()=>{ if(!state.videoDone) pill.innerHTML='&#128274; Modules unlock when the video ends'; }, 2500);
     } else if(video.currentTime > state.videoMax){
       state.videoMax = video.currentTime;
@@ -1037,12 +1194,22 @@ function viewVideo(){
   video.addEventListener('pause',()=>{ save(); viewVideo._lastSave = Date.now(); });
   video.addEventListener('ended',()=>{
     state.videoDone = true; save();
-    pill.className='gate-pill open'; pill.innerHTML='&#10003; Video watched — modules unlocked';
+    pill.className='gate-pill open'; pill.innerHTML='&#10003; Video watched \u2014 modules unlocked';
     go.style.display='';
+    const sk = v.querySelector('#gateSkip'); if(sk) sk.style.display='none';
   });
   video.addEventListener('error',()=>{ v.querySelector('#gateFallback').classList.add('show'); });
   video.querySelector('source').addEventListener('error',()=>{ v.querySelector('#gateFallback').classList.add('show'); });
   v.querySelector('#gateBypass').addEventListener('click',()=>{ state.videoDone=true; save(); location.hash='#/menu'; });
+  const skipBtn = v.querySelector('#gateSkip');
+  if(skipBtn){
+    skipBtn.addEventListener('click',()=>{
+      try{ video.pause(); }catch(e){}
+      state.videoDone = true; save();
+      gcCount('video-skipped', true);
+      location.hash = '#/menu';
+    });
+  }
   return v;
 }
 
@@ -1071,13 +1238,13 @@ function viewCert(){
       <div class="c-line">This certifies that</div>
       <div class="c-name" id="cName">${esc(state.learnerName||'________________')}</div>
       <div class="c-line">has completed all ${numWord(MODULES.length)} modules of this self-paced course,<br>including ${numWord(SCENARIO_COUNT)} applied case scenarios, and passed the knowledge check.</div>
-      <div class="c-meta"><span>Date<br><strong id="cDate">${dateStr}</strong></span><span>Knowledge check<br><strong>${state.quizScore!=null?state.quizScore:QUIZ.length} / ${QUIZ.length}</strong></span><span>Duration<br><strong>~${TOTAL_MINUTES} minutes</strong></span></div>
+      <div class="c-meta"><span>Date<br><strong id="cDate">${dateStr}</strong></span><span>Knowledge check<br><strong>${state.quizScore!=null?state.quizScore:shownQuizLength()} / ${shownQuizLength()}</strong></span><span>Duration<br><strong>~${TOTAL_MINUTES} minutes</strong></span></div>
       <div class="c-foot">Certificate ID: <strong id="cVerify">\u2014</strong> &middot; Issued by InclusionEdge &middot; Disability Awareness@Work</div>
     </div>
     <div class="cert-actions">
-      <button class="btn" id="dlPng" disabled>Download certificate</button>
-      <button class="btn" id="reportBtn" disabled>Report completion (email + download)</button>
-      <a class="btn secondary" href="#/m/5">&larr; Back</a>
+      ${CONFIG.allowCertDownload!==false?'<button class="btn" id="dlPng" disabled>Download certificate</button>':''}
+      ${CONFIG.allowReportCompletion!==false?'<button class="btn" id="reportBtn" disabled>Report completion</button>':''}
+      <a class="btn secondary" href="#/m/${MODULES.length}">&larr; Back</a>
     </div>
     <p class="gate-note" id="nameHint" style="margin-top:10px;color:var(--amber-text);font-weight:700">Enter your name above to enable the buttons.</p>
   </div>`);
@@ -1089,9 +1256,11 @@ function viewCert(){
     const has = !!state.learnerName;
     w.querySelector('#cName').textContent = state.learnerName || '________________';
     w.querySelector('#cVerify').textContent = has ? verifyCode() : '\u2014';
-    dl.disabled = !has; rp.disabled = !has;
+    if(dl){ dl.disabled = !has; dl.style.opacity = has ? '1' : '.5'; }
+    if(rp){ rp.disabled = !has; rp.style.opacity = has ? '1' : '.5'; }
     hint.style.display = has ? 'none' : '';
-    dl.style.opacity = rp.style.opacity = has ? '1' : '.5';
+    /* nothing enabled at all? swap the hint to explain */
+    if(!dl && !rp){ hint.style.display='none'; }
   };
   w.querySelector('#nameApply').addEventListener('click',apply);
   nameInput.addEventListener('change',apply);
@@ -1130,14 +1299,52 @@ function viewCert(){
     x.fillStyle='#4A5A70'; x.font='28px "Atkinson Hyperlegible", Arial';
     x.fillText('Disability Awareness for the Singapore Workplace \u00B7 aligned to Enabling Masterplan 2030', 800, 366);
     x.fillText('This certifies that', 800, 470);
-    x.fillStyle='#1E2A3C'; x.font='800 64px "Bricolage Grotesque", Arial'; x.fillText(state.learnerName||'________________', 800, 556);
+    /* ---- name: wrap to 2 lines if it doesn't fit on one, matching the
+       natural wrapping the on-screen HTML certificate already does.
+       Canvas text never wraps on its own, so this has to be done by hand:
+       measure the name at the base size, word-wrap it if it's too wide,
+       and shrink the font a little further only if it's still more than
+       2 lines after wrapping (e.g. a very long name). Everything below
+       the name (the "has completed…" lines, date/score/duration, and the
+       certificate ID) is then pushed down by exactly one extra line's
+       worth of height, only when a second line was actually used — a
+       normal-length name renders pixel-identical to before this fix. ---- */
+    const NAME_MAX_W = 1300, NAME_BASE_SIZE = 64, NAME_MIN_SIZE = 40;
+    function wrapNameLine(text, size){
+      x.font = '800 '+size+'px "Bricolage Grotesque", Arial';
+      if(x.measureText(text).width <= NAME_MAX_W) return [text];
+      const words = text.split(' ');
+      const lines = []; let cur = '';
+      words.forEach(word=>{
+        const test = cur ? cur+' '+word : word;
+        if(!cur || x.measureText(test).width <= NAME_MAX_W){ cur = test; }
+        else { lines.push(cur); cur = word; }
+      });
+      if(cur) lines.push(cur);
+      return lines;
+    }
+    const nameText = state.learnerName || '________________';
+    function anyLineTooWide(lines){ return lines.some(l=> x.measureText(l).width > NAME_MAX_W); }
+    let nameSize = NAME_BASE_SIZE, nameLines = wrapNameLine(nameText, nameSize);
+    while((nameLines.length > 2 || anyLineTooWide(nameLines)) && nameSize > NAME_MIN_SIZE){ nameSize -= 4; nameLines = wrapNameLine(nameText, nameSize); }
+    if(nameLines.length > 2) nameLines = [nameLines[0], nameLines.slice(1).join(' ')]; // safety cap — extremely long names still get 2 lines, just tighter
+    if(nameLines.length===1 && anyLineTooWide(nameLines)){
+      // last resort: one unbroken word still too wide even at minimum size — break it at a hard
+      // character boundary rather than let it run off the certificate
+      const w = nameLines[0], mid = Math.ceil(w.length/2);
+      nameLines = [w.slice(0,mid)+'\u2011', w.slice(mid)];
+    }
+    x.fillStyle='#1E2A3C'; x.font='800 '+nameSize+'px "Bricolage Grotesque", Arial';
+    const nameLineH = Math.round(nameSize*1.14);
+    nameLines.forEach((ln,i)=> x.fillText(ln, 800, 556 + i*nameLineH));
+    const pushDown = (nameLines.length-1) * nameLineH;
     x.fillStyle='#4A5A70'; x.font='28px "Atkinson Hyperlegible", Arial';
-    x.fillText('has completed all '+numWord(MODULES.length)+' modules of this self-paced course, including '+numWord(SCENARIO_COUNT)+' applied', 800, 640);
-    x.fillText('case scenarios, and passed the knowledge check.', 800, 682);
+    x.fillText('has completed all '+numWord(MODULES.length)+' modules of this self-paced course, including '+numWord(SCENARIO_COUNT)+' applied', 800, 640+pushDown);
+    x.fillText('case scenarios, and passed the knowledge check.', 800, 682+pushDown);
     x.font='700 30px "Atkinson Hyperlegible", Arial'; x.fillStyle='#0F3568';
-    x.fillText('Date: '+dateStr+'      Knowledge check: '+(state.quizScore!=null?state.quizScore:QUIZ.length)+' / '+QUIZ.length+'      Duration: ~'+TOTAL_MINUTES+' minutes', 800, 800);
+    x.fillText('Date: '+dateStr+'      Knowledge check: '+(state.quizScore!=null?state.quizScore:shownQuizLength())+' / '+shownQuizLength()+'      Duration: ~'+TOTAL_MINUTES+' minutes', 800, 800+pushDown);
     x.fillStyle='#4A5A70'; x.font='20px "Atkinson Hyperlegible", Arial';
-    x.fillText('Certificate ID: '+verifyCode()+'  \u00B7  Issued by InclusionEdge  \u00B7  Disability Awareness@Work', 800, 1000);
+    x.fillText('Certificate ID: '+verifyCode()+'  \u00B7  Issued by InclusionEdge  \u00B7  Disability Awareness@Work', 800, 1000+pushDown);
     /* logos: draw whichever are already loaded on the page */
     let lx = 120;
     w.querySelectorAll('.cert-sheet .logo-row img').forEach(img=>{
@@ -1149,36 +1356,63 @@ function viewCert(){
     const a=document.createElement('a'); a.download='da-at-work-certificate.png'; a.href=cv.toDataURL('image/png'); a.click();
     }
   }
-  dl.addEventListener('click',()=>{ if(dl.disabled) return; downloadPng(); gcCount('complete-'+(org.label||'unnamed').replace(/\s+/g,'-')+'-download', true); });
-  rp.addEventListener('click',()=>{
-    if(rp.disabled) return;
-    downloadPng();
-    const subject = 'Course Completion \u2014 Disability Awareness@Work ['+(org.label||'Unspecified')+']';
-    const isoDate = new Date().toISOString().slice(0,10);
-    const body = [
-      'Hi HR team,','',
-      'I\u2019m pleased to let you know I\u2019ve completed the Disability Awareness@Work course.','',
-      'Here are my completion details for your records:','',
-      'Name: '+state.learnerName,
-      'Organisation: '+(org.label||'\u2014'),
-      'Date of completion: '+dateStr,
-      'Knowledge check: '+state.quizScore+' / '+QUIZ.length,
-      'Certificate ID: '+verifyCode(),'',
-      'Record: '+(org.label||'Unspecified')+' | '+state.learnerName+' | '+isoDate+' | '+state.quizScore+'/'+QUIZ.length+' | '+verifyCode(),'',
-      'I\u2019ve downloaded my certificate (da-at-work-certificate.png) and will attach it to this email before sending.','',
-      'Thank you,',state.learnerName
-    ].join('\n');
-    gcCount('complete-'+(org.label||'unnamed').replace(/\s+/g,'-')+'-report', true);
-    const ccParam = CONFIG.reportCC ? '&cc='+encodeURIComponent(CONFIG.reportCC) : '';
-    window.location.href = 'mailto:'+encodeURIComponent(org.email||'')+'?subject='+encodeURIComponent(subject)+ccParam+'&body='+encodeURIComponent(body);
-  });
+  if(dl){
+    dl.addEventListener('click',()=>{ if(dl.disabled) return; downloadPng(); gcCount('complete-'+(org.label||'unnamed').replace(/\s+/g,'-')+'-download', true); });
+  }
+  if(rp){
+    rp.addEventListener('click',()=>{
+      if(rp.disabled) return;
+      const subject = 'Course Completion \u2014 Disability Awareness@Work ['+(org.label||'Unspecified')+']';
+      const isoDate = new Date().toISOString().slice(0,10);
+      const body = [
+        'Hi HR team,','',
+        'I\u2019m pleased to let you know I\u2019ve completed the Disability Awareness@Work course.','',
+        'Here are my completion details for your records:','',
+        'Name: '+state.learnerName,
+        'Organisation: '+(org.label||'\u2014'),
+        'Date of completion: '+dateStr,
+        'Knowledge check: '+state.quizScore+' / '+shownQuizLength(),
+        'Certificate ID: '+verifyCode(),'',
+        'Record: '+(org.label||'Unspecified')+' | '+state.learnerName+' | '+isoDate+' | '+state.quizScore+'/'+shownQuizLength()+' | '+verifyCode(),'',
+        'Thank you,',state.learnerName
+      ].join('\n');
+      gcCount('complete-'+(org.label||'unnamed').replace(/\s+/g,'-')+'-report', true);
+      const ccParam = CONFIG.reportCC ? '&cc='+encodeURIComponent(CONFIG.reportCC) : ''; // Entry #11: blank CC = no cc= parameter emitted at all
+      window.location.href = 'mailto:'+encodeURIComponent(org.email||'')+'?subject='+encodeURIComponent(subject)+ccParam+'&body='+encodeURIComponent(body);
+    });
+  }
   return w;
 }
 
 function sanitizeVal(v){ return String(v==null?'':v).replace(/\\/g,'\\\\').replace(/'/g,"\\'"); }
 function buildConfigJs(c){
   const orgLines = c.orgs.map(o=>`    { hash:'${sanitizeVal(o.hash)}', label:'${sanitizeVal(o.label)}', email:'${sanitizeVal(o.email)}', logo:'${sanitizeVal(o.logo)}' }`).join(',\n');
-  return `/* config.js — Disability Awareness@Work deployment settings\n   Generated by the admin panel. Place beside index.html and upload to your\n   deployment. Editing here by hand is fine too; keep the structure intact. */\nwindow.DAW_CONFIG = {\n  videoSrc: '${sanitizeVal(c.videoSrc)}',\n  videoTitle: '${sanitizeVal(c.videoTitle)}',\n  videoCaptions: '${sanitizeVal(c.videoCaptions)}',\n  videoSkip: ${!!c.videoSkip},\n  logoMain: '${sanitizeVal(c.logoMain)}',\n  reportCC: '${sanitizeVal(c.reportCC)}',\n  goatcounter: '${sanitizeVal(c.goatcounter)}',\n  goatcounterUrl: '${sanitizeVal(c.goatcounterUrl)}',\n  accessDays: ${parseInt(c.accessDays)||30},\n  nameMandatory: ${!!c.nameMandatory},\n  passThreshold: ${parseInt(c.passThreshold)||10},\n  enableSetcode: ${!!c.enableSetcode},\n  adminHash: '${sanitizeVal(c.adminHash)}',\n  orgs: [\n${orgLines}\n  ]\n};\n`;
+  return `/* config.js \u2014 Disability Awareness@Work deployment settings
+   Generated by the admin panel. Place beside index.html and upload to your
+   deployment. Editing here by hand is fine too; keep the structure intact. */
+window.DAW_CONFIG = {
+  videoSrc: '${sanitizeVal(c.videoSrc)}',
+  videoTitle: '${sanitizeVal(c.videoTitle)}',
+  videoCaptions: '${sanitizeVal(c.videoCaptions)}',
+  videoSkip: ${!!c.videoSkip},
+  logoMain: '${sanitizeVal(c.logoMain)}',
+  reportCC: '${sanitizeVal(c.reportCC)}',
+  requestCodeEmail: '${sanitizeVal(c.requestCodeEmail)}',
+  allowCertDownload: ${c.allowCertDownload!==false},
+  allowReportCompletion: ${c.allowReportCompletion!==false},
+  quizShowCount: ${parseInt(c.quizShowCount)||0},
+  goatcounter: '${sanitizeVal(c.goatcounter)}',
+  goatcounterUrl: '${sanitizeVal(c.goatcounterUrl)}',
+  accessDays: ${parseInt(c.accessDays)||30},
+  nameMandatory: ${!!c.nameMandatory},
+  passThreshold: ${parseInt(c.passThreshold)||10},
+  enableSetcode: ${!!c.enableSetcode},
+  adminHash: '${sanitizeVal(c.adminHash)}',
+  orgs: [
+${orgLines}
+  ]
+};
+`;
 }
 
 function viewAdminSetup(){
@@ -1225,7 +1459,7 @@ function viewAdmin(){
     <p class="sub">Change any setting below, then scroll down and click <strong>Generate config.js</strong>, then <strong>Download config.js</strong>. Upload that downloaded file to your website, replacing the old config.js — that one file is where every setting on this page actually lives. Nothing on this page saves by itself, and nothing here is sent anywhere; it all happens in your browser.</p>
     <div class="callout note" style="margin-bottom:18px"><span class="co-label">What this site is currently running on</span>
       <p style="font-size:.86rem">Settings file found: <strong>${loadedFrom}</strong><br>
-      Pass mark: <strong>${CONFIG.passThreshold}/${QUIZ.length}</strong> &middot; Must-watch video: <strong>${CONFIG.videoSkip?'off — learners can skip ahead':'on — learners must watch to the end'}</strong> &middot; Access unlock lasts: <strong>${CONFIG.accessDays} days</strong> &middot; Organisations set up: <strong>${CONFIG.orgs.map(o=>o.label).join(', ')||'none yet'}</strong></p>
+      Pass mark: <strong>${CONFIG.passThreshold}/${shownQuizLength()}</strong>${(CONFIG.quizShowCount|0) && (CONFIG.quizShowCount|0)<QUIZ.length ? ` <em>(sampled from bank of ${QUIZ.length})</em>` : ''} &middot; Must-watch video: <strong>${CONFIG.videoSkip?'off &mdash; learners can skip ahead':'on &mdash; learners must watch to the end'}</strong> &middot; Access unlock lasts: <strong>${CONFIG.accessDays} days</strong> &middot; Organisations set up: <strong>${CONFIG.orgs.map(o=>o.label).join(', ')||'none yet'}</strong></p>
       <p style="font-size:.8rem;color:var(--ink-soft);margin-top:8px">Just uploaded a new config.js and still seeing old settings here? Your browser is showing a saved copy of the old page. Force it to check again: <strong>Ctrl/Cmd + Shift + R</strong>.</p>
     </div>
 
@@ -1238,21 +1472,33 @@ function viewAdmin(){
     </fieldset>
 
     <fieldset><legend>Passing the course</legend>
-      <label>Correct answers needed, out of ${QUIZ.length} knowledge check questions</label>
-      <input type="number" min="1" max="${QUIZ.length}" data-k="passThreshold" value="${c.passThreshold}">
-      <p class="hintline">A learner must get at least this many of the ${QUIZ.length} questions right to complete the course and unlock their certificate. Most awareness courses use a threshold below full marks (e.g. 8 out of 10) rather than requiring every answer correct.</p>
+      <label>Correct answers needed to pass</label>
+      <input type="number" min="1" data-k="passThreshold" value="${c.passThreshold}">
+      <p class="hintline">A learner must get at least this many questions right in the knowledge check to complete the course and unlock their certificate. There are ${QUIZ.length} questions in the bank; the actual number a learner is shown depends on the sampling setting below (if left blank, they see all ${QUIZ.length}). Most awareness courses set the pass mark a little below full marks (e.g. 8 out of 10) rather than requiring a perfect score.</p>
+      <label>How many questions to show a learner (leave blank or 0 for "show all")</label>
+      <input type="number" min="0" max="${QUIZ.length}" data-k="quizShowCount" value="${c.quizShowCount||0}">
+      <p class="hintline">If you enter a smaller number here (say 6 of the ${QUIZ.length}), each learner sees a randomly-sampled subset \u2014 spread across the different learning outcomes, so no outcome is ever skipped entirely. The pass mark above must be no higher than the number shown. For Disability Awareness@Work, leave this at 0 (show all questions) unless you have a specific reason to shorten it.</p>
     </fieldset>
 
     <fieldset><legend>Logos</legend>
-      <label>InclusionEdge logo — file name</label><input type="text" data-k="logoMain" value="${c.logoMain}">
-      <p class="hintline">This logo appears on every page and on every certificate, for every organisation. To add a logo for one specific client organisation, use the Logo file column in the Organisations table below — not here.</p>
+      <label>InclusionEdge logo \u2014 file name</label><input type="text" data-k="logoMain" value="${c.logoMain}">
+      <p class="hintline">This logo appears on every page and on every certificate, for every organisation. To add a logo for one specific client organisation, use the Logo file column in the Organisations table below \u2014 not here.</p>
+    </fieldset>
+
+    <fieldset><legend>What learners can do at the end of the course</legend>
+      <div class="toggle"><input type="checkbox" id="t-dl" data-k="allowCertDownload" ${c.allowCertDownload!==false?'checked':''}><label for="t-dl">Show the "Download certificate" button</label></div>
+      <p class="hintline">When ON, learners who pass the knowledge check can download their certificate as an image file to keep, print or share.</p>
+      <div class="toggle"><input type="checkbox" id="t-rp" data-k="allowReportCompletion" ${c.allowReportCompletion!==false?'checked':''}><label for="t-rp">Show the "Report completion" button</label></div>
+      <p class="hintline">When ON, learners who pass see a button that opens a pre-written email to their HR contact (from the Organisations table below), announcing they\u2019ve completed the course. Turn OFF if HR notification is handled another way.</p>
     </fieldset>
 
     <fieldset><legend>Completion reports &amp; usage stats</legend>
       <label>Also send every completion report to this email (optional)</label><input type="email" data-k="reportCC" value="${c.reportCC}">
-      <p class="hintline">When a learner finishes the course and clicks "Report completion", their email also gets copied here automatically — handy for keeping your own record without asking each client to forward it. Leave blank to turn this off.</p>
+      <p class="hintline">When a learner clicks "Report completion", their email also gets CC\u2019d here \u2014 a handy way to keep your own record. Leave blank to turn this off; no CC address is added when this is empty.</p>
+      <label>Where "request an access code" enquiries go (optional)</label><input type="email" data-k="requestCodeEmail" value="${c.requestCodeEmail}">
+      <p class="hintline">When someone on the login page clicks "Request an access code", their pre-filled email goes to this address. Leave blank to fall back to the address above.</p>
       <div class="row2"><div><label>GoatCounter site code</label><input type="text" data-k="goatcounter" value="${c.goatcounter}"></div><div><label>GoatCounter dashboard link (optional)</label><input type="url" data-k="goatcounterUrl" value="${c.goatcounterUrl}"></div></div>
-      <p class="hintline">GoatCounter is an optional, privacy-friendly visit counter — it only counts anonymous page views, never names or answers. Leave the site code blank to turn this off completely. If you leave the dashboard link blank, this panel will work out the link for you from the site code.</p>
+      <p class="hintline">GoatCounter is an optional, privacy-friendly visit counter \u2014 it only counts anonymous page views, never names or answers. Leave the site code blank to turn this off completely. If you leave the dashboard link blank, this panel will work out the link for you from the site code.</p>
       <p class="hintline" id="gcLink"></p>
     </fieldset>
 
@@ -1332,6 +1578,57 @@ function viewAdmin(){
   return v;
 }
 
+function openRequestAccessDialog(prefillMessage){
+  const orgListHTML = CONFIG.orgs.filter(o=>o.label).map(o=>`<option value="${esc(o.label)}"></option>`).join('');
+  const bodyHTML = `
+    <label for="raqOrg">Which organisation are you with?</label>
+    <input id="raqOrg" list="raqOrgs" type="text" autocomplete="organization" placeholder="e.g. Acme Corp" required>
+    ${orgListHTML?`<datalist id="raqOrgs">${orgListHTML}</datalist>`:''}
+    <label for="raqEmail">Your email address</label>
+    <input id="raqEmail" type="email" autocomplete="email" placeholder="you@example.com" required>
+    <label for="raqMsg">A short message</label>
+    <textarea id="raqMsg" placeholder="Anything the administrator should know \u2014 for example, when you were told about this course, or who to check with." required>${esc(prefillMessage||'')}</textarea>
+    <p class="dlg-hint">Clicking <strong>Send request</strong> opens your device\u2019s email app with the details pre-filled, ready for you to review and send. Nothing is sent from this page directly.</p>
+  `;
+  openDialog({
+    title: 'Request an access code',
+    lede: 'Fill in a few details and we\u2019ll open a pre-written email addressed to the course administrator.',
+    bodyHTML,
+    actions: [
+      { label:'Cancel', kind:'ghost', onClick: d => d.close() },
+      { label:'Send request', onClick: d => {
+          const org = d.root.querySelector('#raqOrg').value.trim();
+          const email = d.root.querySelector('#raqEmail').value.trim();
+          const msg = d.root.querySelector('#raqMsg').value.trim();
+          if(!org || !email || !msg){ d.showError('Please fill in your organisation, your email address, and a short message.'); return; }
+          if(!/.+@.+\..+/.test(email)){ d.showError('That doesn\u2019t look like a full email address \u2014 please check.'); return; }
+          const to = CONFIG.requestCodeEmail || CONFIG.reportCC || '';
+          const subject = 'Access code request \u2014 Disability Awareness@Work';
+          const body = [
+            'Hello,','',
+            'I would like access to the Disability Awareness@Work course.','',
+            'Organisation: '+org,
+            'My email: '+email,'',
+            'Message:',msg,'',
+            '\u2014 Sent from the course access request form.'
+          ].join('\r\n');
+          const href = 'mailto:'+encodeURIComponent(to)+'?subject='+encodeURIComponent(subject)+'&body='+encodeURIComponent(body);
+          window.location.href = href;
+          gcCount('access-code-requested', true);
+          d.close();
+          setTimeout(()=>{
+            openDialog({
+              title:'Almost there',
+              lede:'Your email app should have opened with the request ready to send. If nothing opened, please check your email app is set up on this device, or contact your administrator directly.',
+              actions:[ { label:'OK', onClick:d2=>d2.close() } ]
+            });
+          }, 300);
+        }
+      }
+    ]
+  });
+}
+
 function viewGate(){
   const v = el(`<div class="gatewrap">
     <div class="lockicon"><svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="4.5" y="10" width="15" height="10" rx="2.5"/><path d="M8 10V7.5a4 4 0 0 1 8 0V10"/></svg></div>
@@ -1341,17 +1638,24 @@ function viewGate(){
     <input id="nameInput" type="text" autocomplete="name" placeholder="${CONFIG.nameMandatory?'Your name':'Your name (optional — you can add it later)'}" aria-label="Your name" style="margin-bottom:12px">
     <input id="codeInput" type="password" autocomplete="off" placeholder="Access code" aria-label="Access code">
     <button class="btn" id="codeGo" style="width:100%;justify-content:center">Enter the course &rarr;</button>
-    <p class="gate-note">${CONFIG.nameMandatory?'Enter your name as it should appear on your certificate (you can adjust it later).':'Your name is optional here \u2014 you\u2019ll be asked for it again, and can change it, at the certificate step.'} Your device stays unlocked for ${CONFIG.accessDays} days. <strong>Your name stays on this device and is used only for your certificate</strong> \u2014 the access check happens here, on your device, and nothing you type is sent anywhere.</p>
+    <p class="gate-note" style="margin-top:16px">${CONFIG.nameMandatory?'Enter your name as it should appear on your certificate (you can adjust it later).':'Your name is optional here \u2014 you\u2019ll be asked for it again, and can change it, at the certificate step.'} Your device stays unlocked for ${CONFIG.accessDays} days. <strong>Your name stays on this device and is used only for your certificate</strong> \u2014 the access check happens here, on your device, and nothing you type is sent anywhere.</p>
+    <p class="gate-note" style="margin-top:8px;text-align:center">Don\u2019t have an access code? <button type="button" id="requestCodeLink" style="background:none;border:none;padding:0;font:inherit;color:var(--teal);text-decoration:underline;cursor:pointer;font-weight:700">Request one from the course administrator</button></p>
   </div>`);
   const nameF = v.querySelector('#nameInput'), input = v.querySelector('#codeInput'), err = v.querySelector('#gateErr');
   nameF.value = state.learnerName || '';
-  function fail(msg){ err.textContent = msg; err.classList.add('show'); }
+  function fail(msg){ err.innerHTML = msg; err.classList.add('show'); }
   function attempt(){
     const nm = (nameF.value||'').trim();
     const h = codeHash(input.value||'');
     const org = CONFIG.orgs.find(o=>o.hash===h);
     if(CONFIG.nameMandatory && !nm){ fail('Please enter your name to continue.'); nameF.focus(); return; }
-    if(!input.value || !org){ fail('That code isn\u2019t recognised. Please check with your HR team or programme administrator for your organisation\u2019s access code.'); input.value=''; input.focus(); return; }
+    if(!input.value || !org){
+      const wrongCode = input.value;
+      fail('That access code isn\u2019t recognised. Please check the code with your HR team or the course administrator \u2014 or <button type="button" id="requestFromError" style="background:none;border:none;padding:0;font:inherit;color:var(--deep);text-decoration:underline;cursor:pointer;font-weight:700">request a new access code here</button>.');
+      const requestFromError = err.querySelector('#requestFromError');
+      if(requestFromError) requestFromError.addEventListener('click', ()=>openRequestAccessDialog(wrongCode?`I tried the code "${wrongCode}" but it wasn\u2019t accepted.`:''));
+      input.value=''; input.focus(); return;
+    }
     state.learnerName = nm;
     state.access = {codeHash:h, grantedAt:Date.now()}; save();
     gcCount('unlock-'+(org.label||'unnamed').replace(/\s+/g,'-'), true);
@@ -1359,6 +1663,7 @@ function viewGate(){
     location.hash = '#/'; render();
   }
   v.querySelector('#codeGo').addEventListener('click',attempt);
+  v.querySelector('#requestCodeLink').addEventListener('click',()=>openRequestAccessDialog(''));
   input.addEventListener('keydown',e=>{ if(e.key==='Enter') attempt(); });
   nameF.addEventListener('keydown',e=>{ if(e.key==='Enter') input.focus(); });
   setTimeout(()=>nameF.focus(),50);
@@ -1399,7 +1704,7 @@ function viewCover(){
     <div class="audience">
       <div class="aud-card"><h3>Five moments</h3><p>Meeting someone new. Communicating clearly. Working side by side. Offering help. Including. The moments where recognition is won or lost.</p></div>
       <div class="aud-card"><h3>Three real cases</h3><p>A shift briefing. A staff canteen. A colleague whose month has gone wrong. Branching scenarios with consequences \u2014 set in Singapore workplaces.</p></div>
-      <div class="aud-card"><h3>No expertise required</h3><p>This is a Level 0 foundation \u2014 awareness, not expertise. You are not expected to have the answers. You are expected to not look away.</p></div>
+      <div class="aud-card"><h3>No expertise required</h3><p>This is an introductory course \u2014 awareness, not expertise. You are not expected to have the answers. You are expected to not look away.</p></div>
     </div>
   </div>`);
 }
@@ -1446,7 +1751,8 @@ function viewModule(num){
   if(m===FINAL_MODULE){
     foot.appendChild(m6Actions());
   } else {
-    const doneBtn = el(`<button class="btn">${state.completed[m.id]?'&#10003; Completed':'Mark module complete'}</button>`);
+    const isLastBeforeFinal = MODULES.indexOf(m) === MODULES.length-2;
+    const doneBtn = el(`<button class="btn">${state.completed[m.id]?(isLastBeforeFinal?'&#10003; On to knowledge check':'&#10003; Next module'):(isLastBeforeFinal?'Continue to knowledge check':'Next module')}</button>`);
     if(state.completed[m.id]) doneBtn.classList.add('secondary');
     doneBtn.addEventListener('click',()=>{
       state.completed[m.id]=true; save(); updateRibbon();
@@ -1458,15 +1764,29 @@ function viewModule(num){
 }
 
 /* ---------- router ---------- */
+function updateOrgBadge(){
+  const badge = document.getElementById('orgBadge');
+  if(!badge) return;
+  const org = accessValid() ? currentOrg() : null;
+  if(!org || (!org.label && !org.logo)){ badge.hidden = true; badge.setAttribute('aria-hidden','true'); badge.innerHTML=''; return; }
+  const parts = [];
+  if(org.logo){ parts.push(`<img src="${esc(org.logo)}" alt="" onerror="this.remove()">`); }
+  parts.push(`<span class="orgbadge-prefix">For</span><span class="orgbadge-label">${esc(org.label||'')}</span>`);
+  badge.innerHTML = parts.join('');
+  badge.hidden = false;
+  badge.setAttribute('aria-hidden','false');
+  badge.setAttribute('aria-label','Course accessed via organisation: '+(org.label||''));
+}
+
 function render(){
   const app = document.getElementById('app');
   const h = location.hash.replace('#/','');
   app.innerHTML='';
   let view;
-  if(h==='setcode'){ if(CONFIG.enableSetcode){ app.appendChild(viewSetCode()); } else { location.hash='#/'; return render(); } updateRibbon(); window.scrollTo({top:0}); return; }
-  if(h==='adminsetup'){ app.appendChild(viewAdminSetup()); updateRibbon(); window.scrollTo({top:0}); return; }
-  if(h==='admin'){ app.appendChild(viewAdmin()); updateRibbon(); window.scrollTo({top:0}); return; }
-  if(!accessValid()){ gcCount('/gate'); app.appendChild(viewGate()); updateRibbon(); window.scrollTo({top:0}); return; }
+  if(h==='setcode'){ if(CONFIG.enableSetcode){ app.appendChild(viewSetCode()); } else { location.hash='#/'; return render(); } updateRibbon(); updateOrgBadge(); window.scrollTo({top:0}); return; }
+  if(h==='adminsetup'){ app.appendChild(viewAdminSetup()); updateRibbon(); updateOrgBadge(); window.scrollTo({top:0}); return; }
+  if(h==='admin'){ app.appendChild(viewAdmin()); updateRibbon(); updateOrgBadge(); window.scrollTo({top:0}); return; }
+  if(!accessValid()){ gcCount('/gate'); app.appendChild(viewGate()); updateRibbon(); updateOrgBadge(); window.scrollTo({top:0}); return; }
   gcCount('/'+(h||'cover'));
   if(h==='' ) view = viewCover();
   else if(h==='video') view = viewVideo();
@@ -1476,6 +1796,7 @@ function render(){
   else view = viewCover();
   app.appendChild(view);
   updateRibbon();
+  updateOrgBadge();
   window.scrollTo({top:0});
   app.focus({preventScroll:true});
 }
@@ -1490,11 +1811,22 @@ window.addEventListener('hashchange',render);
   document.head.appendChild(sc);
 })();
 document.getElementById('resetProgress').addEventListener('click',()=>{
-  if(!confirm('Reset all progress on this device? This clears module completion, quiz score, reflections and the access unlock. This cannot be undone.')) return;
-  if(store){ try{ store.removeItem('wa_state_v1'); }catch(e){} }
-  state.completed={}; state.reflections={}; state.confidenceStart=null; state.confidenceEnd=null;
-  state.quizScore=null; state.videoDone=false; state.videoMax=0; state.learnerName=''; state.access=null;
-  location.hash='#/'; render();
+  openDialog({
+    caution: true,
+    title: 'Reset your progress?',
+    lede: 'This clears every module you\u2019ve marked complete, your knowledge check score, everything you\u2019ve written in reflection boxes, and your saved access unlock \u2014 on this device only. This cannot be undone.',
+    bodyHTML: '<p class="dlg-hint"><strong>You will need to re-enter your organisation\u2019s access code afterwards</strong> to get back into the course. Only reset if you\u2019re sure.</p>',
+    actions: [
+      { label:'Keep my progress', kind:'ghost', onClick: d => d.close() },
+      { label:'Yes, reset everything', kind:'danger', onClick: d => {
+          if(store){ try{ store.removeItem('wa_state_v1'); }catch(e){} }
+          state.completed={}; state.reflections={}; state.confidenceStart=null; state.confidenceEnd=null;
+          state.quizScore=null; state.videoDone=false; state.videoMax=0; state.learnerName=''; state.access=null;
+          d.close(); location.hash='#/'; render();
+        }
+      }
+    ]
+  });
 });
 render();
 </script>

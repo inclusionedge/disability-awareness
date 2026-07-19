@@ -1,8 +1,8 @@
-# Disability Awareness@Work — beta v01
+# Disability Awareness@Work — beta v02
 
 An interactive workplace learning experience by **InclusionEdge**.
 
-This is the **first release on the new multi-file architecture** (previously a single `index.html`, versions v1–v20). Content now lives in its own files, separate from the app engine, so editing a module's wording never means opening the engine code — and vice versa.
+Second release on the multi-file architecture, following beta v01. New client-requested features and one certificate bug fix are folded in.
 
 ---
 
@@ -13,8 +13,8 @@ Every file and folder below must be uploaded together, in the same structure, to
 ```
 your-deployment-folder/
 ├── index.html                                    ← the app engine — do not rename
-├── config.js                                      ← your settings (access codes, branding, analytics)
-├── quiz.js                                        ← the 10-question knowledge check
+├── config.js                                      ← your settings (access codes, branding, toggles)
+├── quiz.js                                        ← the 10-question knowledge check bank
 ├── content/
 │   ├── module-1-why-this-matters.js
 │   ├── module-2-understanding-disability.js
@@ -30,17 +30,23 @@ your-deployment-folder/
 - **Module order is set by `index.html`**, not by the content files themselves — see "Changing the number or order of modules" below.
 - **`intro.mp4`, `intro.vtt`, and `inclusionedge.png`** (plus any per-organisation logo files you add in the Admin panel) are not included in this package — upload your own alongside these files, using the exact file names set in the Admin panel.
 
-## What's new in beta v01
+## What's new in beta v02
 
-- **Multi-file structure** — content, quiz, settings and app engine are now separate files (see above). A wording change only ever touches one small content file.
-- **Three new content block types** — images, self-hosted video clips, and select-all-that-apply quick checks, in addition to the existing text, quote, callout, stats, tiles, accordion, tabs, carousel, flip cards, myth/fact sort, MCQ, scenario and reflection blocks.
-- **Any number of modules** — add, remove or reorder a line in `index.html`'s content `<script>` list (see below), and the menu, progress bar, "Module X of N" labels, certificate wording and duration all adjust automatically. Nothing needs to be counted or renumbered by hand.
-- **Fixed:** the "require a name at entry" toggle in the Admin panel now actually does something — in the v20 build it was present but not wired up.
-- **Fixed:** the certificate used to always display a perfect score, even if your pass mark allowed for a lower one. It now shows the learner's actual score.
-- **Admin panel and setup screens rewritten** in plain language, with a hint under every field, for an administrator with no technical background.
-- **GoatCounter analytics connected** — site code `inclusionedge` is set in `config.js`.
+**New features (client requests):**
+- **Request access code** — a "Don't have an access code?" link on the login page opens a small dialog that pre-fills an email to the course administrator.
+- **Custom wrong-code error** — the error state now includes a "request a new access code" link inline, so a stuck learner isn't a dead end.
+- **Visible "Skip video" button** when the videoSkip setting is on (previously the setting only unlocked free scrubbing).
+- **"Next module" button label** replaces the older "Mark module complete" — more accurate to what it does. The button before the final module reads "Continue to knowledge check".
+- **Restyled reset-progress button** in a caution colour with an in-app confirm modal (replacing the browser's native `confirm()` popup).
+- **Kindness Traps** in Module 4 converted from tiles to a large-type carousel for easier reading.
+- **"Introductory course"** replaces "Level 0" in both learner-facing spots — clearer for a non-technical audience.
+- **Org badge in the persistent header** once access is granted (subtle logo + name — restrained, not a full brand takeover).
+- **Independent Download / Report toggles** on the certificate page. Either can be turned off from the Admin panel without affecting the other.
+- **Blank CC handling** — leaving the "also CC" email blank now cleanly omits the CC from the completion mailto entirely.
+- **Dynamic quiz length** — a harness capability: the Admin panel can set how many questions to show a learner. When smaller than the bank, questions are sampled proportionally across the learning outcomes so no outcome is ever skipped. Default is 0 (show all 10) for this course.
 
-There is also a section at the very end of Module 5, clearly marked **"BETA v01 — feature preview (delete before production)"**, showing one working example of each new block type so you can click-test them once this is deployed. Delete that section from `content/module-5-recap-knowledge-check.js` once you're happy everything works — search that file for "BETA v01".
+**Fixed:**
+- **Certificate name wrap in the downloadable PNG.** Long names correctly wrap to two lines now, with everything below shifting down to keep the layout clean. Short/medium names render identically to before.
 
 ## Changing the number or order of modules
 
